@@ -1,7 +1,8 @@
 package com.example.rakyatgamezomeapi.service.impl;
 
 import com.example.rakyatgamezomeapi.model.authorize.UserAccount;
-import com.example.rakyatgamezomeapi.repository.UserAccountRepository;
+import com.example.rakyatgamezomeapi.model.entity.User;
+import com.example.rakyatgamezomeapi.repository.UserRepository;
 import com.example.rakyatgamezomeapi.service.UserAccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -13,21 +14,39 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserAccountServiceImpl implements UserAccountService {
-    private final UserAccountRepository userAccountRepository;
+    private final UserRepository userRepository;
     @Override
     public UserAccount loadUserById(String id) {
-        return userAccountRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("username not found"));
+        User user =userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("username not found"));
+        return UserAccount.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .role(user.getRole())
+                .build();
     }
 
     @Override
     public UserAccount getByContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return userAccountRepository.findByUsername(authentication.getPrincipal().toString())
+        User user = userRepository.findByEmail(authentication.getPrincipal().toString())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return UserAccount.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .role(user.getRole())
+                .build();
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userAccountRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("username not found"));
+        User user =userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("username not found"));
+        return UserAccount.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .password(user.getPassword())
+                .role(user.getRole())
+                .build();
     }
 }

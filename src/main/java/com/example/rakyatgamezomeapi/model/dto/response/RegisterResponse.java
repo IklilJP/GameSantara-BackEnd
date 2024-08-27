@@ -12,5 +12,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class RegisterResponse {
     private String username;
+    private String email;
     private ERole role;
 }

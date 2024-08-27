@@ -36,6 +36,7 @@ public class JwtServiceImpl implements JwtService {
             return JWT.create()
                     .withSubject(userAccount.getId())
                     .withClaim("role", userAccount.getRole().getName().name())
+                    .withClaim("username", userAccount.getUsername())
                     .withIssuedAt(Instant.now())
                     .withExpiresAt(Instant.now().plusSeconds(JWT_EXPIRATION))
                     .withIssuer(ISSUER)

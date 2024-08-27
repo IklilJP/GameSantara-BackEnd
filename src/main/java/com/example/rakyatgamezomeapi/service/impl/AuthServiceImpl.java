@@ -3,12 +3,11 @@ package com.example.rakyatgamezomeapi.service.impl;
 import com.example.rakyatgamezomeapi.constant.ERole;
 import com.example.rakyatgamezomeapi.model.dto.request.AuthRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.RegisterUserRequest;
-import com.example.rakyatgamezomeapi.model.dto.request.UserRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.LoginResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.RegisterResponse;
 import com.example.rakyatgamezomeapi.model.entity.Role;
 import com.example.rakyatgamezomeapi.model.authorize.UserAccount;
-import com.example.rakyatgamezomeapi.repository.UserAccountRepository;
+import com.example.rakyatgamezomeapi.model.entity.User;
 import com.example.rakyatgamezomeapi.repository.UserRepository;
 import com.example.rakyatgamezomeapi.service.AuthService;
 import com.example.rakyatgamezomeapi.service.JwtService;
@@ -23,10 +22,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    private final UserAccountRepository userAccountRepository;
     private final UserService userService;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
@@ -38,27 +38,17 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RegisterResponse registerUser(RegisterUserRequest request) {
         Role role = roleService.getOrSave(ERole.USER);
-        String hashPassword = passwordEncoder.encode(request.getPassword());
-
-        UserAccount account = UserAccount.builder()
-                .email(request.getEmail())
-                .password(hashPassword)
-                .role(role)
-                .build();
-
-        userAccountRepository.saveAndFlush(account);
-
-        UserRequest userRequest = UserRequest.builder()
-                .email(request.getEmail())
-                .password(hashPassword)
-                .fullName(request.getFullName())
+        User user = User.builder()
                 .username(request.getUsername())
-                .role(ERole.USER)
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(role)
+                .fullName(request.getFullName())
                 .build();
-        userService.create(userRequest);
+        userRepository.saveAndFlush(user);
+
         return RegisterResponse.builder()
-                .username(userRequest.getUsername())
-                .role(ERole.USER)
+                .username(user.getUsername())
+                .email(user.getEmail())
                 .build();
     }
 
@@ -70,6 +60,7 @@ public class AuthServiceImpl implements AuthService {
         );
 
         Authentication authenticated = authenticationManager.authenticate(authentication);
+
         SecurityContextHolder.getContext().setAuthentication(authenticated);
 
         UserAccount userAccount = (UserAccount) authentication.getPrincipal();
@@ -86,7 +77,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean validateToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserAccount userAccount = userAccountRepository.findByUsername(authentication.getPrincipal().toString()).orElse(null);
-        return userAccount != null;
+        User user = userRepository.findByEmail(authentication.getPrincipal().toString()).orElse(null);
+        return user != null;
     }
 }
