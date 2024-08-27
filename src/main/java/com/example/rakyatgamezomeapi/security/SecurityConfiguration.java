@@ -32,8 +32,9 @@ public class SecurityConfiguration {
                 })
                 .sessionManagement(cfg -> cfg.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> req.dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v1/api-docs/**").permitAll()
+                        .requestMatchers("/swagger-ui/**", "/docs/api/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/tags/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
