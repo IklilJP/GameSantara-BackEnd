@@ -5,6 +5,7 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.rakyatgamezomeapi.model.dto.response.JwtClaims;
 import com.example.rakyatgamezomeapi.model.authorize.UserAccount;
 import com.example.rakyatgamezomeapi.service.JwtService;
@@ -63,7 +64,19 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public JwtClaims getClaimsByToken(String token) {
-        return null;
+        try{
+            Algorithm algorithm = Algorithm.HMAC512(JWT_SECRET);
+            JWTVerifier jwtVerifier = JWT.require(algorithm)
+                    .withIssuer(ISSUER)
+                    .build();
+            DecodedJWT decodedJWT = jwtVerifier.verify(parseJwt(token));
+            return JwtClaims.builder()
+                    .userAccountId(decodedJWT.getSubject())
+                    .role(decodedJWT.getClaim("role").asString())
+                    .build();
+        }catch (JWTVerificationException e){
+            return null;
+        }
     }
 
     private String parseJwt(String token){
