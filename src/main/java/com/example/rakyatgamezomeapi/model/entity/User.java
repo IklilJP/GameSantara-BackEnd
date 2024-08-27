@@ -17,16 +17,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(nullable = false)
     private String username;
 
+    @Column(nullable = false)
     private String password;
 
     @Column(name = "full_name")
     private String fullName;
 
+    @Column(unique = true)
     private String email;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinTable(name = "role_id")
     private Role role;
 

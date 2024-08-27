@@ -24,4 +24,7 @@ public class ProfilePicture {
 
     @Column(name = "update_at")
     private Long updatedAt;
+
+    @OneToOne(mappedBy = "profilePicture")
+    private User user;
 }
