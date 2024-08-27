@@ -1,5 +1,6 @@
-package com.example.rakyatgamezomeapi.model.entity;
+package com.example.rakyatgamezomeapi.model.authorize;
 
+import com.example.rakyatgamezomeapi.model.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +21,7 @@ public class UserAccount implements UserDetails {
 
     private String id;
 
-    private String username;
+    private String email;
 
     private String password;
 
@@ -29,7 +30,7 @@ public class UserAccount implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> simpleGrantedAuthorities = new ArrayList<>();
-        simpleGrantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
+        simpleGrantedAuthorities.add(new SimpleGrantedAuthority(role.getName().name()));
         return simpleGrantedAuthorities;
     }
 
@@ -40,7 +41,7 @@ public class UserAccount implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
     @Override

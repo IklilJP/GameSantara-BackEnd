@@ -1,5 +1,6 @@
 package com.example.rakyatgamezomeapi.model.dto.response;
 
+import com.example.rakyatgamezomeapi.constant.ERole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class LoginResponse {
     private String userId;
-    private String username;
+    private String email;
     private String token;
-    private String role;
+    private ERole role;
 }

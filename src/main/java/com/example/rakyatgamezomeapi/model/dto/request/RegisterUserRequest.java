@@ -22,7 +22,6 @@ public class RegisterUserRequest {
     @Size(min = 8, max = 20)
     private String password;
 
-    @JsonProperty("full_name")
     @NotBlank(message = "Full Name is required")
     @Size(min = 4, max = 35)
     private String fullName;

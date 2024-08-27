@@ -1,9 +1,8 @@
 package com.example.rakyatgamezomeapi.service;
 
-import com.example.rakyatgamezomeapi.model.entity.UserAccount;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import com.example.rakyatgamezomeapi.model.dto.request.UserRequest;
+import com.example.rakyatgamezomeapi.model.dto.response.UserResponse;
 
-public interface UserService extends UserDetailsService {
-    UserAccount loadUserById(String id);
-    UserAccount getByContext();
+public interface UserService {
+    UserResponse create(UserRequest userRequest);
 }
