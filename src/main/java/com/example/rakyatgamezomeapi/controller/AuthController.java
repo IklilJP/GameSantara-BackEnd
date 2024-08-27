@@ -7,6 +7,7 @@ import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.LoginResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.RegisterResponse;
 import com.example.rakyatgamezomeapi.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/register/user")
-    public ResponseEntity<CommonResponse<RegisterResponse>> registerUser(@RequestBody RegisterUserRequest request) {
+    public ResponseEntity<CommonResponse<RegisterResponse>> registerUser(@Valid @RequestBody RegisterUserRequest request) {
         RegisterResponse registerResponse = authService.registerUser(request);
 
         CommonResponse<RegisterResponse> commonResponse = CommonResponse.<RegisterResponse>builder()
@@ -35,7 +36,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<CommonResponse<LoginResponse>> login(@RequestBody AuthRequest request){
+    public ResponseEntity<CommonResponse<LoginResponse>> login(@Valid @RequestBody AuthRequest request){
         LoginResponse loginResponse = authService.login(request);
 
         CommonResponse<LoginResponse> commonResponse = CommonResponse.<LoginResponse>builder()

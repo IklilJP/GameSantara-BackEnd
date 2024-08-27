@@ -19,13 +19,13 @@ public class RegisterUserRequest {
     private String username;
 
     @NotBlank(message = "Password is required")
-    @Size(min = 8, max = 20)
+    @Size(min = 8, max = 20, message = "Password has 8 minimal character and 20 maximal character")
     private String password;
 
     @NotBlank(message = "Full Name is required")
-    @Size(min = 4, max = 35)
+    @Size(min = 4, max = 35, message = "Full name must have at least 4 character and maximum 35 character")
     private String fullName;
 
-    @Email
+    @Email(message = "Must email format")
     private String email;
 }

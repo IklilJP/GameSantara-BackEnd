@@ -42,19 +42,22 @@ public class AuthServiceImpl implements AuthService {
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(role)
+                .email(request.getEmail())
                 .fullName(request.getFullName())
+                .createdAt(System.currentTimeMillis())
                 .build();
         userRepository.saveAndFlush(user);
 
         return RegisterResponse.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
+                .role(user.getRole().getName())
                 .build();
     }
 
     @Override
     public LoginResponse login(AuthRequest request) {
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
+        Authentication authentication =  new UsernamePasswordAuthenticationToken(
                 request.getEmail(),
                 request.getPassword()
         );
@@ -63,7 +66,7 @@ public class AuthServiceImpl implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(authenticated);
 
-        UserAccount userAccount = (UserAccount) authentication.getPrincipal();
+        UserAccount userAccount = (UserAccount) authenticated.getPrincipal();
 
         String token = jwtService.generateToken(userAccount);
         return LoginResponse.builder()
