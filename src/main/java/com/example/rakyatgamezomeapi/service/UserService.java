@@ -5,5 +5,6 @@ import com.example.rakyatgamezomeapi.model.dto.response.UserResponse;
 
 public interface UserService {
     UserResponse create(UserRequest userRequest);
-    UserResponse getUserById(String id);
+    UserResponse getUserByToken();
+    UserResponse updateUserByToken(UserRequest userRequest);
 }

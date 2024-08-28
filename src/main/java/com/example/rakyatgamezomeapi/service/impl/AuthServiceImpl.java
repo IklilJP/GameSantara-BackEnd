@@ -13,7 +13,9 @@ import com.example.rakyatgamezomeapi.service.AuthService;
 import com.example.rakyatgamezomeapi.service.JwtService;
 import com.example.rakyatgamezomeapi.service.RoleService;
 import com.example.rakyatgamezomeapi.service.UserService;
+import com.example.rakyatgamezomeapi.utils.exceptions.EmailAlreadyExistsException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -21,8 +23,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -39,14 +39,18 @@ public class AuthServiceImpl implements AuthService {
     public RegisterResponse registerUser(RegisterUserRequest request) {
         Role role = roleService.getOrSave(ERole.USER);
         User user = User.builder()
-                .username(request.getUsername())
+                .username(request.getUsername().toLowerCase())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(role)
                 .email(request.getEmail())
                 .fullName(request.getFullName())
                 .createdAt(System.currentTimeMillis())
                 .build();
-        userRepository.saveAndFlush(user);
+        try {
+            userRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException e) {
+            throw new EmailAlreadyExistsException("Email already exist");
+        }
 
         return RegisterResponse.builder()
                 .username(user.getUsername())

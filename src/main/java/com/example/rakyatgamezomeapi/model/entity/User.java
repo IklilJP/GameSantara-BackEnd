@@ -30,11 +30,11 @@ public class User {
     private String email;
 
     @ManyToOne
-    @JoinTable(name = "role_id")
+    @JoinColumn(name = "role_id")
     private Role role;
 
     @OneToOne
-    @JoinTable(name="profile_picture_id")
+    @JoinColumn(name="profile_picture_id")
     private ProfilePicture profilePicture;
 
     private Boolean isActive = true;
