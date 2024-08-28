@@ -17,8 +17,7 @@ public class ProfilePicture {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Lob
-    private byte image;
+    private String image;
 
     @Column(name = "create_at")
     private Long createdAt;

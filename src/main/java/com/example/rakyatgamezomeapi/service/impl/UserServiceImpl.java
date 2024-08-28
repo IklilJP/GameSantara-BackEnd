@@ -8,6 +8,7 @@ import com.example.rakyatgamezomeapi.model.dto.request.UserUsernameRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.UserResponse;
 import com.example.rakyatgamezomeapi.model.entity.User;
 import com.example.rakyatgamezomeapi.repository.UserRepository;
+import com.example.rakyatgamezomeapi.service.ProfilePictureService;
 import com.example.rakyatgamezomeapi.service.RoleService;
 import com.example.rakyatgamezomeapi.service.UserAccountService;
 import com.example.rakyatgamezomeapi.service.UserService;
@@ -21,7 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserAccountService userAccountService;
-    private final RoleService roleService;
+    private final ProfilePictureService profilePictureService;
 
     @Override
     public UserResponse getUserByToken() {
