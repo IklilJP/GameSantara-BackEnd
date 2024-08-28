@@ -2,6 +2,8 @@ package com.example.rakyatgamezomeapi.model.dto.request;
 
 import com.example.rakyatgamezomeapi.constant.ERole;
 import com.example.rakyatgamezomeapi.model.entity.ProfilePicture;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,13 +13,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserRequest {
-    private String id;
+public class UserUsernameRequest {
+    @NotBlank
+    @Size(min = 4, max = 20)
     private String username;
-    private String password;
-    private String fullName;
-    private String email;
-    private ProfilePicture profilePicture;
-    private ERole role;
-    private String bio;
 }

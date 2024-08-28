@@ -2,6 +2,7 @@ package com.example.rakyatgamezomeapi.controller.exception;
 
 import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.utils.exceptions.EmailAlreadyExistsException;
+import com.example.rakyatgamezomeapi.utils.exceptions.UsernameAlreadyExistException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +44,15 @@ public class GlobalExceptionController {
 
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<CommonResponse<String>> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
+        CommonResponse<String> commonResponse = CommonResponse.<String>builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(commonResponse);
+    }
+
+    @ExceptionHandler(UsernameAlreadyExistException.class)
+    public ResponseEntity<CommonResponse<String>> handleUsernameAlreadyExistsException(UsernameAlreadyExistException ex) {
         CommonResponse<String> commonResponse = CommonResponse.<String>builder()
                 .status(HttpStatus.CONFLICT.value())
                 .message(ex.getMessage())

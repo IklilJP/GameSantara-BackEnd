@@ -14,6 +14,7 @@ import com.example.rakyatgamezomeapi.service.JwtService;
 import com.example.rakyatgamezomeapi.service.RoleService;
 import com.example.rakyatgamezomeapi.service.UserService;
 import com.example.rakyatgamezomeapi.utils.exceptions.EmailAlreadyExistsException;
+import com.example.rakyatgamezomeapi.utils.exceptions.UsernameAlreadyExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -49,7 +50,10 @@ public class AuthServiceImpl implements AuthService {
         try {
             userRepository.saveAndFlush(user);
         } catch (DataIntegrityViolationException e) {
-            throw new EmailAlreadyExistsException("Email already exist");
+            if(e.getMessage().contains("email_unique")){
+                throw new EmailAlreadyExistsException("Email already exists");
+            }
+            throw new UsernameAlreadyExistException("Username already exist");
         }
 
         return RegisterResponse.builder()
