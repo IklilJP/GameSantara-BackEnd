@@ -21,7 +21,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagResponse createTag(TagRequest tagRequest) {
         Tag tag = Tag.builder()
-                .name(tagRequest.getName())
+                .name(tagRequest.getName().trim())
                 .createdAt(Instant.now().toEpochMilli())
                 .build();
         tag = tagRepository.save(tag);
@@ -31,7 +31,7 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagResponse updateTag(String id, TagRequest tagRequest) {
         Tag tag = tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Tag not found"));
-        tag.setName(tagRequest.getName());
+        tag.setName(tagRequest.getName().trim());
         tag.setUpdatedAt(Instant.now().toEpochMilli());
         tag = tagRepository.save(tag);
         return mapToResponse(tag);

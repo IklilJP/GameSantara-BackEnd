@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -17,6 +19,7 @@ public class Tag {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(name = "name", unique = true, nullable = false)
     private String name;
 
     @Column(name = "created_at")
@@ -24,4 +27,7 @@ public class Tag {
 
     @Column(name = "updated_at")
     private Long updatedAt;
+
+    @OneToMany(mappedBy = "tag")
+    private List<TagPost> tagPosts;
 }
