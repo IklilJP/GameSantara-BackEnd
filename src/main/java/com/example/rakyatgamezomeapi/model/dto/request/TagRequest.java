@@ -11,4 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TagRequest {
     private String name;
+
+    private String imgurl;
 }

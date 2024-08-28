@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class TagResponse {
     private String id;
     private String name;
+    private String imgUrl;
     private Long createdAt;
     private Long updatedAt;
 }

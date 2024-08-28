@@ -22,6 +22,7 @@ public class TagServiceImpl implements TagService {
     public TagResponse createTag(TagRequest tagRequest) {
         Tag tag = Tag.builder()
                 .name(tagRequest.getName().trim())
+                .imgUrl(tagRequest.getImgurl())
                 .createdAt(Instant.now().toEpochMilli())
                 .build();
         tag = tagRepository.save(tag);
@@ -32,6 +33,7 @@ public class TagServiceImpl implements TagService {
     public TagResponse updateTag(String id, TagRequest tagRequest) {
         Tag tag = tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Tag not found"));
         tag.setName(tagRequest.getName().trim());
+        tag.setImgUrl(tagRequest.getImgurl());
         tag.setUpdatedAt(Instant.now().toEpochMilli());
         tag = tagRepository.save(tag);
         return mapToResponse(tag);
@@ -52,6 +54,7 @@ public class TagServiceImpl implements TagService {
         return TagResponse.builder()
                 .id(tag.getId())
                 .name(tag.getName())
+                .imgUrl(tag.getImgUrl())
                 .createdAt(tag.getCreatedAt())
                 .updatedAt(tag.getUpdatedAt())
                 .build();

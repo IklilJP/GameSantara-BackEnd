@@ -22,6 +22,9 @@ public class Tag {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
+    @Column(name = "img_url")
+    private  String imgUrl;
+
     @Column(name = "created_at")
     private Long createdAt;
 
