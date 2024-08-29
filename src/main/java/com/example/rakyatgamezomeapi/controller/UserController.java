@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(APIUrl.USER_API)
@@ -59,6 +60,17 @@ public class UserController {
         CommonResponse<UserResponse> commonResponse = CommonResponse.<UserResponse>builder()
                 .status(HttpStatus.OK.value())
                 .message("User profile updated successfully")
+                .data(userResponse)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    }
+
+    @PatchMapping("/profile-picture")
+    public ResponseEntity<CommonResponse<UserResponse>> updateProfilePicture(@RequestParam("picture") MultipartFile file) {
+        UserResponse userResponse = userService.updateUserProfilePicture(file);
+        CommonResponse<UserResponse> commonResponse = CommonResponse.<UserResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("User profile picture updated successfully")
                 .data(userResponse)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);

@@ -5,7 +5,9 @@ import com.example.rakyatgamezomeapi.model.authorize.UserAccount;
 import com.example.rakyatgamezomeapi.model.dto.request.UserBioRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.UserFullNameRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.UserUsernameRequest;
+import com.example.rakyatgamezomeapi.model.dto.response.ProfilePictureResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.UserResponse;
+import com.example.rakyatgamezomeapi.model.entity.ProfilePicture;
 import com.example.rakyatgamezomeapi.model.entity.User;
 import com.example.rakyatgamezomeapi.repository.UserRepository;
 import com.example.rakyatgamezomeapi.service.ProfilePictureService;
@@ -15,6 +17,8 @@ import com.example.rakyatgamezomeapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -57,6 +61,17 @@ public class UserServiceImpl implements UserService {
         return toResponse(userRepository.saveAndFlush(user));
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public UserResponse updateUserProfilePicture(MultipartFile profilePicture) {
+        UserAccount userAccount = userAccountService.getByContext();
+        User user = findByIdOrThrowNotFound(userAccount.getId());
+        ProfilePicture picture = profilePictureService.upload(profilePicture, user.getId());
+        user.setProfilePicture(picture);
+        user.setUpdatedAt(System.currentTimeMillis());
+        return toResponse(userRepository.saveAndFlush(user));
+    }
+
     private User findByIdOrThrowNotFound(String id) {
         return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ResponseMessage.ERROR_NOT_FOUND));
     }
@@ -66,8 +81,8 @@ public class UserServiceImpl implements UserService {
                 .id(user.getId())
                 .username(user.getUsername())
                 .fullName(user.getFullName())
-                .email(user.getEmail())
                 .profilePicture(user.getProfilePicture())
+                .email(user.getEmail())
                 .bio(user.getBio())
                 .build();
     }
