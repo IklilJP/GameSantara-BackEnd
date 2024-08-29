@@ -23,7 +23,7 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         CommonResponse<?> res = CommonResponse.builder()
                 .status(HttpStatus.UNAUTHORIZED.value())
-                .message(accessDeniedException.getMessage())
+                .message("Proses ini membutuhkan otorisasi")
                 .build();
         String responseString = objectMapper.writeValueAsString(res);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);

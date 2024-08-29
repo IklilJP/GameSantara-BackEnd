@@ -23,7 +23,7 @@ public class AuthenticationEntryPointImpl implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         CommonResponse<?> res = CommonResponse.builder()
                 .status(HttpStatus.UNAUTHORIZED.value())
-                .message(authException.getMessage())
+                .message("Email atau password salah")
                 .build();
         String responseString = objectMapper.writeValueAsString(res);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
