@@ -27,7 +27,7 @@ public class FileUploadUtil {
             throw new FileCloudStorageException("File is oversize");
         }
         if (!isAllowedExtension(file.getOriginalFilename(), pattern)) {
-            throw new FileCloudStorageException("Only jpg, png, gif, bmp files are allowed");
+            throw new FileCloudStorageException("Only jpg, jpeg, png, gif, bmp files are allowed");
         }
     }
 
