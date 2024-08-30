@@ -12,7 +12,6 @@ import com.example.rakyatgamezomeapi.repository.UserRepository;
 import com.example.rakyatgamezomeapi.service.AuthService;
 import com.example.rakyatgamezomeapi.service.JwtService;
 import com.example.rakyatgamezomeapi.service.RoleService;
-import com.example.rakyatgamezomeapi.service.UserService;
 import com.example.rakyatgamezomeapi.utils.exceptions.EmailAlreadyExistsException;
 import com.example.rakyatgamezomeapi.utils.exceptions.UsernameAlreadyExistException;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
-    private final UserService userService;
     private final RoleService roleService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
@@ -39,6 +37,33 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RegisterResponse registerUser(RegisterUserRequest request) {
         Role role = roleService.getOrSave(ERole.USER);
+        User user = User.builder()
+                .username(request.getUsername().toLowerCase())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .role(role)
+                .email(request.getEmail())
+                .fullName(request.getFullName())
+                .createdAt(System.currentTimeMillis())
+                .build();
+        try {
+            userRepository.saveAndFlush(user);
+        } catch (DataIntegrityViolationException e) {
+            if(e.getMessage().contains("email_unique")){
+                throw new EmailAlreadyExistsException("Email already exists");
+            }
+            throw new UsernameAlreadyExistException("Username already exist");
+        }
+
+        return RegisterResponse.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .role(user.getRole().getName())
+                .build();
+    }
+
+    @Override
+    public RegisterResponse registerAdmin(RegisterUserRequest request) {
+        Role role = roleService.getOrSave(ERole.ADMIN);
         User user = User.builder()
                 .username(request.getUsername().toLowerCase())
                 .password(passwordEncoder.encode(request.getPassword()))

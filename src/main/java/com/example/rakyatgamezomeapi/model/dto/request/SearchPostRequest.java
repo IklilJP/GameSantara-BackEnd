@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TagRequest {
-    private String id;
-    private String name;
-
-    private String imgurl;
+public class SearchPostRequest {
+    private String query;
+    private Boolean status;
+    private Integer page;
+    private Integer size;
 }

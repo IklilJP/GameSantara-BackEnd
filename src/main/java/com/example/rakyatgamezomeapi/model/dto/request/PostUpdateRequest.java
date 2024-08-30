@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TagRequest {
+public class PostUpdateRequest {
     private String id;
-    private String name;
-
-    private String imgurl;
+    private String title;
+    private String body;
+    private String tagId;
 }

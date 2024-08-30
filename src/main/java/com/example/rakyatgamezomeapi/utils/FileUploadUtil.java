@@ -1,6 +1,9 @@
 package com.example.rakyatgamezomeapi.utils;
 
+import com.example.rakyatgamezomeapi.utils.exceptions.FileCloudStorageException;
+import com.example.rakyatgamezomeapi.utils.exceptions.FileStorageException;
 import lombok.experimental.UtilityClass;
+import org.hibernate.AssertionFailure;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.regex.Matcher;
@@ -21,10 +24,10 @@ public class FileUploadUtil {
 
     public static void assertAllowedExtension(MultipartFile file, String pattern){
         if(file.getSize() > MAX_FILE_SIZE){
-            throw new IllegalArgumentException("File is oversize");
+            throw new FileCloudStorageException("File is oversize");
         }
         if (!isAllowedExtension(file.getOriginalFilename(), pattern)) {
-            throw new AssertionError("Only jpg, png, gif, bmp files are allowed");
+            throw new FileCloudStorageException("Only jpg, png, gif, bmp files are allowed");
         }
     }
 

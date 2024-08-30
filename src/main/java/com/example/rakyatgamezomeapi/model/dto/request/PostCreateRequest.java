@@ -1,5 +1,6 @@
 package com.example.rakyatgamezomeapi.model.dto.request;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,9 +10,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TagRequest {
-    private String id;
-    private String name;
+public class PostCreateRequest {
+    private String title;
+    private String body;
 
-    private String imgurl;
+    @NotBlank
+    private String tagId;
 }

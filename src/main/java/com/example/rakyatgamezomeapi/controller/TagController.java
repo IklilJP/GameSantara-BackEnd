@@ -2,6 +2,7 @@ package com.example.rakyatgamezomeapi.controller;
 
 import com.example.rakyatgamezomeapi.constant.APIUrl;
 import com.example.rakyatgamezomeapi.model.dto.request.TagRequest;
+import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.TagResponse;
 import com.example.rakyatgamezomeapi.service.TagService;
 import lombok.RequiredArgsConstructor;
@@ -19,27 +20,47 @@ public class TagController {
     private final TagService tagService;
 
     @PostMapping
-    public ResponseEntity<TagResponse> createTag(@RequestBody TagRequest tagRequest) {
+    public ResponseEntity<CommonResponse<TagResponse>> createTag(@RequestBody TagRequest tagRequest) {
         TagResponse tagResponse = tagService.createTag(tagRequest);
-        return new ResponseEntity<>(tagResponse, HttpStatus.CREATED);
+        CommonResponse<TagResponse> commonResponse = CommonResponse.<TagResponse>builder()
+                .status(HttpStatus.CREATED.value())
+                .message("Tag created successfully")
+                .data(tagResponse)
+                .build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<TagResponse> updateTag(@PathVariable String id, @RequestBody TagRequest tagRequest) {
-        TagResponse tagResponse = tagService.updateTag(id, tagRequest);
-        return new ResponseEntity<>(tagResponse, HttpStatus.OK);
+    @PutMapping()
+    public ResponseEntity<CommonResponse<TagResponse>> updateTag(@RequestBody TagRequest tagRequest) {
+        TagResponse tagResponse = tagService.updateTag(tagRequest);
+        CommonResponse<TagResponse> commonResponse = CommonResponse.<TagResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("Tag updated successfully")
+                .data(tagResponse)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TagResponse> getTagById(@PathVariable String id) {
+    public ResponseEntity<CommonResponse<TagResponse>> getTagById(@PathVariable String id) {
         TagResponse tagResponse = tagService.getTagById(id);
-        return new ResponseEntity<>(tagResponse, HttpStatus.OK);
+        CommonResponse<TagResponse> commonResponse = CommonResponse.<TagResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("Tag get successfully")
+                .data(tagResponse)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
     @GetMapping
-    public ResponseEntity<List<TagResponse>> getAllTags() {
+    public ResponseEntity<CommonResponse<List<TagResponse>>> getAllTags() {
         List<TagResponse> tagResponses = tagService.getAllTags();
-        return new ResponseEntity<>(tagResponses, HttpStatus.OK);
+        CommonResponse<List<TagResponse>> commonResponse = CommonResponse.<List<TagResponse>>builder()
+                .status(HttpStatus.OK.value())
+                .message("Tags get successfully")
+                .data(tagResponses)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
 }

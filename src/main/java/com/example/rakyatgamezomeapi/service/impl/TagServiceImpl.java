@@ -30,8 +30,8 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public TagResponse updateTag(String id, TagRequest tagRequest) {
-        Tag tag = tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Tag not found"));
+    public TagResponse updateTag(TagRequest tagRequest) {
+        Tag tag = tagRepository.findById(tagRequest.getId()).orElseThrow(() -> new RuntimeException("Tag not found"));
         tag.setName(tagRequest.getName().trim());
         tag.setImgUrl(tagRequest.getImgurl());
         tag.setUpdatedAt(Instant.now().toEpochMilli());
@@ -43,6 +43,11 @@ public class TagServiceImpl implements TagService {
     public TagResponse getTagById(String id) {
         Tag tag = tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Tag not found"));
         return mapToResponse(tag);
+    }
+
+    @Override
+    public Tag getTagByIdForTrx(String id) {
+        return tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Tag not found"));
     }
 
     @Override

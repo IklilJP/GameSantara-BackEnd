@@ -2,6 +2,8 @@ package com.example.rakyatgamezomeapi.controller.exception;
 
 import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.utils.exceptions.EmailAlreadyExistsException;
+import com.example.rakyatgamezomeapi.utils.exceptions.FileCloudStorageException;
+import com.example.rakyatgamezomeapi.utils.exceptions.ResourceNotFoundException;
 import com.example.rakyatgamezomeapi.utils.exceptions.UsernameAlreadyExistException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -58,6 +60,24 @@ public class GlobalExceptionController {
                 .message(ex.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(commonResponse);
+    }
+
+    @ExceptionHandler(FileCloudStorageException.class)
+    public ResponseEntity<CommonResponse<String>> handleFileCloudStorageException(FileCloudStorageException ex) {
+        CommonResponse<String> commonResponse = CommonResponse.<String>builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(commonResponse);
+    }
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<CommonResponse<String>> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        CommonResponse<String> commonResponse = CommonResponse.<String>builder()
+                .status(HttpStatus.NOT_FOUND.value())
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(commonResponse);
     }
 
 }

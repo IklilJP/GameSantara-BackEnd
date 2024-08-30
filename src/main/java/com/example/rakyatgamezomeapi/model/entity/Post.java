@@ -1,10 +1,13 @@
 package com.example.rakyatgamezomeapi.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Data
@@ -23,11 +26,13 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
-
-    @Column(name = "upvotes_count")
-    private Integer upvotesCount;
+    @ManyToOne
+    @JoinColumn(name = "tag_id")
+    @JsonIgnore
+    private Tag tag;
 
     @Column(name = "created_at")
     private Long createdAt;

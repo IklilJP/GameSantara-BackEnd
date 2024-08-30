@@ -5,15 +5,14 @@ import com.example.rakyatgamezomeapi.model.authorize.UserAccount;
 import com.example.rakyatgamezomeapi.model.dto.request.UserBioRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.UserFullNameRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.UserUsernameRequest;
-import com.example.rakyatgamezomeapi.model.dto.response.ProfilePictureResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.UserResponse;
 import com.example.rakyatgamezomeapi.model.entity.ProfilePicture;
 import com.example.rakyatgamezomeapi.model.entity.User;
 import com.example.rakyatgamezomeapi.repository.UserRepository;
 import com.example.rakyatgamezomeapi.service.ProfilePictureService;
-import com.example.rakyatgamezomeapi.service.RoleService;
 import com.example.rakyatgamezomeapi.service.UserAccountService;
 import com.example.rakyatgamezomeapi.service.UserService;
+import com.example.rakyatgamezomeapi.utils.FileUploadUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,6 +31,17 @@ public class UserServiceImpl implements UserService {
     public UserResponse getUserByToken() {
         UserAccount userAccount = userAccountService.getByContext();
         return toResponse(findByIdOrThrowNotFound(userAccount.getId()));
+    }
+
+    @Override
+    public UserResponse getUserById(String id) {
+        return toResponse(findByIdOrThrowNotFound(id));
+    }
+
+    @Override
+    public User getUserByTokenForTsx() {
+        UserAccount userAccount = userAccountService.getByContext();
+        return findByIdOrThrowNotFound(userAccount.getId());
     }
 
     @Override
@@ -66,6 +76,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUserProfilePicture(MultipartFile profilePicture) {
         UserAccount userAccount = userAccountService.getByContext();
         User user = findByIdOrThrowNotFound(userAccount.getId());
+        FileUploadUtil.assertAllowedExtension(profilePicture, FileUploadUtil.IMAGE_PATTERN);
         ProfilePicture picture = profilePictureService.upload(profilePicture, user.getId());
         user.setProfilePicture(picture);
         user.setUpdatedAt(System.currentTimeMillis());

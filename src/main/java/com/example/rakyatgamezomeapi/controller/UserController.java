@@ -11,6 +11,7 @@ import com.example.rakyatgamezomeapi.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,17 @@ public class UserController {
     @GetMapping
     public ResponseEntity<CommonResponse<UserResponse>> getUserProfile() {
         UserResponse userResponse = userService.getUserByToken();
+        CommonResponse<UserResponse> commonResponse = CommonResponse.<UserResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("User profile retrieved successfully")
+                .data(userResponse)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CommonResponse<UserResponse>> getUserProfileById(@PathVariable("id") String id) {
+        UserResponse userResponse = userService.getUserById(id);
         CommonResponse<UserResponse> commonResponse = CommonResponse.<UserResponse>builder()
                 .status(HttpStatus.OK.value())
                 .message("User profile retrieved successfully")
@@ -65,7 +77,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
-    @PatchMapping("/profile-picture")
+    @PatchMapping(value = "/profile-picture", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse<UserResponse>> updateProfilePicture(@RequestParam("picture") MultipartFile file) {
         UserResponse userResponse = userService.updateUserProfilePicture(file);
         CommonResponse<UserResponse> commonResponse = CommonResponse.<UserResponse>builder()

@@ -43,9 +43,11 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
     public ProfilePicture upload(MultipartFile file, String userId) {
         try{
             Map param1 = ObjectUtils.asMap(
+                    "public_id", "user-profile-pictures/"+userId,
                     "use_filename", true,
-                    "unique_filename", false,
-                    "overwrite", true
+                    "unique_filename", true,
+                    "overwrite", true,
+                    "folder", "profile-pictures"
             );
             Map result = cloudinary.uploader().upload(file.getBytes(), param1);
             final String url = (String) result.get("secure_url");

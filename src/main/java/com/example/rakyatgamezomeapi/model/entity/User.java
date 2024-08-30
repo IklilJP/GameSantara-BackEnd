@@ -1,10 +1,8 @@
 package com.example.rakyatgamezomeapi.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Data
@@ -12,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Table(name = "users")
+@EqualsAndHashCode(exclude = {"profilePicture", "role"})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -31,10 +30,12 @@ public class User {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
+    @JsonIgnore
     private Role role;
 
     @OneToOne
     @JoinColumn(name="profile_picture_id")
+    @JsonIgnore
     private ProfilePicture profilePicture;
 
     private Boolean isActive = true;

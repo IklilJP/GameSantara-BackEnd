@@ -1,5 +1,6 @@
 package com.example.rakyatgamezomeapi.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,5 +27,6 @@ public class ProfilePicture {
     private Long updatedAt;
 
     @OneToOne(mappedBy = "profilePicture")
+    @JsonIgnore
     private User user;
 }

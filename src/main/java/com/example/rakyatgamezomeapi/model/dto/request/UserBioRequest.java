@@ -1,8 +1,5 @@
 package com.example.rakyatgamezomeapi.model.dto.request;
 
-import com.example.rakyatgamezomeapi.constant.ERole;
-import com.example.rakyatgamezomeapi.model.entity.ProfilePicture;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

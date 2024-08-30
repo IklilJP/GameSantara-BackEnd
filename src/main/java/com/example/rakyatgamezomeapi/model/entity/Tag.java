@@ -1,5 +1,6 @@
 package com.example.rakyatgamezomeapi.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,5 +33,6 @@ public class Tag {
     private Long updatedAt;
 
     @OneToMany(mappedBy = "tag")
-    private List<TagPost> tagPosts;
+    @JsonIgnore
+    private List<Post> posts;
 }

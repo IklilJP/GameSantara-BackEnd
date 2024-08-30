@@ -7,6 +7,7 @@ import com.example.rakyatgamezomeapi.model.dto.response.RegisterResponse;
 
 public interface AuthService {
     RegisterResponse registerUser(RegisterUserRequest request);
+    RegisterResponse registerAdmin(RegisterUserRequest request);
     LoginResponse login(AuthRequest request);
 
     boolean validateToken();
