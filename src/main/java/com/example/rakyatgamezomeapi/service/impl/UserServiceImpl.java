@@ -45,6 +45,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUserByIdForTsx(String id) {
+        return findByIdOrThrowNotFound(id);
+    }
+
+    @Override
     public UserResponse updateUserBioByToken(UserBioRequest userRequest) {
         UserAccount userAccount = userAccountService.getByContext();
         User user = findByIdOrThrowNotFound(userAccount.getId());
@@ -95,6 +100,10 @@ public class UserServiceImpl implements UserService {
                 .profilePicture(user.getProfilePicture())
                 .email(user.getEmail())
                 .bio(user.getBio())
+                .followingsCount((long) user.getFollowings().size())
+                .followersCount((long) user.getFolloweds().size())
+                .createdAt(user.getCreatedAt())
+                .updatedAt(user.getUpdatedAt())
                 .build();
     }
 }

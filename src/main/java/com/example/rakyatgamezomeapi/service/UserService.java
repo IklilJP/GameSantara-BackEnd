@@ -11,6 +11,7 @@ public interface UserService {
     UserResponse getUserByToken();
     UserResponse getUserById(String id);
     User getUserByTokenForTsx();
+    User getUserByIdForTsx(String id);
     UserResponse updateUserBioByToken(UserBioRequest userRequest);
     UserResponse updateUserFullNameByToken(UserFullNameRequest userRequest);
     UserResponse updateUserUsernameByToken(UserUsernameRequest userRequest);

@@ -1,5 +1,6 @@
 package com.example.rakyatgamezomeapi.model.entity;
 
+import com.example.rakyatgamezomeapi.constant.EVoteType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +26,8 @@ public class VoteComment {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
-    private Integer votes;
+    @Enumerated(EnumType.STRING)
+    private EVoteType voteType;
 
     @Column(name = "created_at")
     private Long createdAt;

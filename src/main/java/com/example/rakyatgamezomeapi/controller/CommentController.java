@@ -5,6 +5,7 @@ import com.example.rakyatgamezomeapi.model.dto.request.CommentRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.CommentResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,7 +43,7 @@ public class CommentController {
     }
 
     @PostMapping
-    public ResponseEntity<CommonResponse<CommentResponse>> createComment(@RequestBody CommentRequest commentRequest) {
+    public ResponseEntity<CommonResponse<CommentResponse>> createComment(@Valid @RequestBody CommentRequest commentRequest) {
         CommentResponse commentResponse = commentService.addComment(commentRequest);
         CommonResponse<CommentResponse> commonResponse = CommonResponse.<CommentResponse>builder()
                 .status(HttpStatus.CREATED.value())
@@ -53,7 +54,7 @@ public class CommentController {
     }
 
     @PostMapping("/child-comment")
-    public ResponseEntity<CommonResponse<CommentResponse>> addChildComment(@RequestBody CommentRequest commentRequest) {
+    public ResponseEntity<CommonResponse<CommentResponse>> addChildComment(@Valid @RequestBody CommentRequest commentRequest) {
         CommentResponse commentResponse = commentService.addChildComment(commentRequest);
         CommonResponse<CommentResponse> commonResponse = CommonResponse.<CommentResponse>builder()
                 .status(HttpStatus.CREATED.value())
@@ -64,7 +65,7 @@ public class CommentController {
     }
 
     @PutMapping
-    public ResponseEntity<CommonResponse<CommentResponse>> updateComment(@RequestBody CommentRequest commentRequest) {
+    public ResponseEntity<CommonResponse<CommentResponse>> updateComment(@Valid @RequestBody CommentRequest commentRequest) {
         CommentResponse commentResponse = commentService.updateComment(commentRequest);
         CommonResponse<CommentResponse> commonResponse = CommonResponse.<CommentResponse>builder()
                 .status(HttpStatus.CREATED.value())

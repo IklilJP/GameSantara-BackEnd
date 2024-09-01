@@ -19,6 +19,9 @@ public class PostResponse {
     private String user;
     private String tagName;
     private String tagImgUrl;
+    private Long upVotesCount;
+    private Long downVotesCount;
+    private Long commentsCount;
     private Long createAt;
     private Long updateAt;
 }

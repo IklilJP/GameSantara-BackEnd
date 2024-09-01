@@ -35,6 +35,11 @@ public class CommentServiceImpl implements CommentService {
         return toResponse(findCommentByIdOrThrow(id));
     }
 
+    @Override
+    public Comment getCommentByIdForTrx(String id) {
+        return findCommentByIdOrThrow(id);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public CommentResponse addComment(CommentRequest request) {

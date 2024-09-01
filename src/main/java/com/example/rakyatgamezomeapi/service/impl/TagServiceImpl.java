@@ -5,7 +5,9 @@ import com.example.rakyatgamezomeapi.model.dto.response.TagResponse;
 import com.example.rakyatgamezomeapi.model.entity.Tag;
 import com.example.rakyatgamezomeapi.repository.TagRepository;
 import com.example.rakyatgamezomeapi.service.TagService;
+import com.example.rakyatgamezomeapi.utils.exceptions.TagAlreadyExistException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -25,7 +27,11 @@ public class TagServiceImpl implements TagService {
                 .imgUrl(tagRequest.getImgurl())
                 .createdAt(Instant.now().toEpochMilli())
                 .build();
-        tag = tagRepository.save(tag);
+        try{
+            tag = tagRepository.saveAndFlush(tag);
+        }catch(DataIntegrityViolationException e){
+            throw new TagAlreadyExistException("Tag already exists");
+        }
         return mapToResponse(tag);
     }
 
@@ -35,7 +41,11 @@ public class TagServiceImpl implements TagService {
         tag.setName(tagRequest.getName().trim());
         tag.setImgUrl(tagRequest.getImgurl());
         tag.setUpdatedAt(Instant.now().toEpochMilli());
-        tag = tagRepository.save(tag);
+        try {
+            tag = tagRepository.saveAndFlush(tag);
+        }catch (DataIntegrityViolationException e){
+            throw new TagAlreadyExistException("Tag already exists");
+        }
         return mapToResponse(tag);
     }
 

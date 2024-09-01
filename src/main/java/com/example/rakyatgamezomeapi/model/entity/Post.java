@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -33,6 +34,14 @@ public class Post {
     @JoinColumn(name = "tag_id")
     @JsonIgnore
     private Tag tag;
+
+    @OneToMany(mappedBy = "post")
+    @JsonIgnore
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "post")
+    @JsonIgnore
+    private List<VotePost> votes;
 
     @Column(name = "created_at")
     private Long createdAt;

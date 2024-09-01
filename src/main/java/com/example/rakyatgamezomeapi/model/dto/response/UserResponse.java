@@ -17,4 +17,8 @@ public class UserResponse {
     private String email;
     private ProfilePicture profilePicture;
     private String bio;
+    private Long followersCount;
+    private Long followingsCount;
+    private Long createdAt;
+    private Long updatedAt;
 }

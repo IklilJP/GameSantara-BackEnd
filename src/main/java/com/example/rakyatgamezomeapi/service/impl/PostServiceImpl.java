@@ -1,5 +1,6 @@
 package com.example.rakyatgamezomeapi.service.impl;
 
+import com.example.rakyatgamezomeapi.constant.EVoteType;
 import com.example.rakyatgamezomeapi.model.dto.request.PostCreateRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.PostUpdateRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.SearchPostRequest;
@@ -100,6 +101,9 @@ public class PostServiceImpl implements PostService {
                 .body(post.getBody())
                 .tagName(post.getTag() != null ? post.getTag().getName() : "No Tag")
                 .tagImgUrl(post.getTag() != null ? post.getTag().getImgUrl() : "No Image Tag")
+                .commentsCount((long) post.getComments().size())
+                .upVotesCount(post.getVotes().stream().filter(votePost -> votePost.getVoteType() == EVoteType.UPVOTE).count())
+                .downVotesCount(post.getVotes().stream().filter(votePost -> votePost.getVoteType() == EVoteType.DOWNVOTE).count())
                 .createAt(post.getCreatedAt())
                 .updateAt(post.getUpdatedAt())
                 .build();

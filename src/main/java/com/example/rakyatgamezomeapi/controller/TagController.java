@@ -5,6 +5,7 @@ import com.example.rakyatgamezomeapi.model.dto.request.TagRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.TagResponse;
 import com.example.rakyatgamezomeapi.service.TagService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class TagController {
     private final TagService tagService;
 
     @PostMapping
-    public ResponseEntity<CommonResponse<TagResponse>> createTag(@RequestBody TagRequest tagRequest) {
+    public ResponseEntity<CommonResponse<TagResponse>> createTag(@Valid @RequestBody TagRequest tagRequest) {
         TagResponse tagResponse = tagService.createTag(tagRequest);
         CommonResponse<TagResponse> commonResponse = CommonResponse.<TagResponse>builder()
                 .status(HttpStatus.CREATED.value())
@@ -31,7 +32,7 @@ public class TagController {
     }
 
     @PutMapping()
-    public ResponseEntity<CommonResponse<TagResponse>> updateTag(@RequestBody TagRequest tagRequest) {
+    public ResponseEntity<CommonResponse<TagResponse>> updateTag(@Valid @RequestBody TagRequest tagRequest) {
         TagResponse tagResponse = tagService.updateTag(tagRequest);
         CommonResponse<TagResponse> commonResponse = CommonResponse.<TagResponse>builder()
                 .status(HttpStatus.OK.value())

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Data
 @AllArgsConstructor
@@ -37,6 +39,14 @@ public class User {
     @JoinColumn(name="profile_picture_id")
     @JsonIgnore
     private ProfilePicture profilePicture;
+
+    @OneToMany(mappedBy = "followingUser")
+    @JsonIgnore
+    private List<Follow> followings;
+
+    @OneToMany(mappedBy = "followedUser")
+    @JsonIgnore
+    private List<Follow> followeds;
 
     private Boolean isActive = true;
 
