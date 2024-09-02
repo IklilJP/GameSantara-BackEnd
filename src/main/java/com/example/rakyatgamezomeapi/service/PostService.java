@@ -15,8 +15,7 @@ public interface PostService {
     Page<PostResponse> getAllPosts(SearchPostRequest request);
     PostResponse getPostById(String id);
     Post getPostByIdForTrx(String id);
-    PostResponse createPost(PostCreateRequest request);
-    PostResponse updatePost(PostUpdateRequest request);
-    PostResponse uploadPictures(List<MultipartFile> files, String postId);
+    PostResponse createPost(PostCreateRequest request, List<MultipartFile> files);
+    PostResponse updatePost(PostUpdateRequest request, List<MultipartFile> files);
     void deletePost(String id);
 }

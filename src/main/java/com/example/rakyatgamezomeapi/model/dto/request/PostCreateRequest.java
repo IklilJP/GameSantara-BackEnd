@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,7 +15,6 @@ import lombok.NoArgsConstructor;
 public class PostCreateRequest {
     private String title;
     private String body;
-
     @NotBlank
     private String tagId;
 }

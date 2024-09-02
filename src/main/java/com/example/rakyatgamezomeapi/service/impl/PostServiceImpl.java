@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,50 +58,53 @@ public class PostServiceImpl implements PostService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public PostResponse createPost(PostCreateRequest request) {
+    public PostResponse createPost(PostCreateRequest request, List<MultipartFile> files) {
         User user = userService.getUserByTokenForTsx();
         Tag tag = tagService.getTagByIdForTrx(request.getTagId());
+        List<PostPicture> postPictureList = new ArrayList<>();
         Post post = Post.builder()
                 .title(request.getTitle())
                 .body(request.getBody())
+                .pictures(postPictureList)
                 .user(user)
                 .tag(tag)
                 .createdAt(System.currentTimeMillis())
                 .build();
 
-        return toResponse(postRepository.saveAndFlush(post));
+        post = postRepository.save(post);
+
+        Post finalPost = post;
+        files.forEach(file -> {
+            PostPicture postPicture = postPictureService.uploadPicture(file, finalPost.getId());
+            postPicture.setPost(finalPost);
+            postPictureList.add(postPicture);
+        });
+
+        return toResponse(postRepository.saveAndFlush(finalPost));
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public PostResponse updatePost(PostUpdateRequest request) {
+    public PostResponse updatePost(PostUpdateRequest request, List<MultipartFile> files) {
         User user = userService.getUserByTokenForTsx();
         Post post = findPostByIdOrThrow(request.getId());
         Tag tag = tagService.getTagByIdForTrx(request.getTagId());
+        List<PostPicture> postPictureList = post.getPictures() == null ? new ArrayList<>() : post.getPictures();
 
         if(!Objects.equals(user.getId(), post.getUser().getId())) {
             throw new AuthenticationException("You don't have permission to update this post");
         }
 
+        files.forEach(file -> {
+            PostPicture postPicture = postPictureService.uploadPicture(file, post.getId());
+            postPictureList.add(postPicture);
+        });
+
         post.setTitle(request.getTitle());
         post.setBody(request.getBody());
         post.setTag(tag);
+        post.setPictures(postPictureList);
         post.setUpdatedAt(System.currentTimeMillis());
-        return toResponse(postRepository.saveAndFlush(post));
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    @Override
-    public PostResponse uploadPictures(List<MultipartFile> files, String postId) {
-        Post post = findPostByIdOrThrow(postId);
-        List<PostPicture> foundPictures = post.getPictures();
-        files.forEach(file -> {
-            FileUploadUtil.assertAllowedExtension(file, FileUploadUtil.IMAGE_PATTERN);
-            PostPicture picture = postPictureService.uploadPicture(file, postId);
-            foundPictures.add(picture);
-            post.setPictures(foundPictures);
-            post.setUpdatedAt(System.currentTimeMillis());
-        });
         return toResponse(postRepository.saveAndFlush(post));
     }
 

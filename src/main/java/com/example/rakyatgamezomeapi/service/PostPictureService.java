@@ -5,5 +5,5 @@ import com.example.rakyatgamezomeapi.model.entity.PostPicture;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PostPictureService {
-    PostPicture uploadPicture(MultipartFile file, String postId );
+    PostPicture uploadPicture(MultipartFile file, String postId);
 }

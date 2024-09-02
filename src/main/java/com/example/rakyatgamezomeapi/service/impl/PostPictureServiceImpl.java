@@ -27,27 +27,22 @@ public class PostPictureServiceImpl implements PostPictureService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public PostPicture uploadPicture(MultipartFile file, String postId) {
+        String originalFileName = postId + "_" + file.getOriginalFilename();
+        String sendFileName = originalFileName.substring(0, originalFileName.lastIndexOf("."));
         try{
             Map param = ObjectUtils.asMap(
-                    "public_id", "post-pictures/"+postId+"_"+file.getName(),
+                    "public_id", "post-pictures/"+sendFileName,
                     "use_filename", true,
                     "unique_filename", true,
-                    "overwrite", true,
+                    "overwrite", false,
                     "folder", "posts/"+postId+"/"
             );
             Map result = cloudinary.uploader().upload(file.getBytes(), param);
             final String url = (String) result.get("secure_url");
-            List<PostPicture> postPictures = postPictureRepository.findAllByPostId(postId);
-            PostPicture newPostPicture = new PostPicture();
-            if(!postPictures.isEmpty()) {
-                newPostPicture.setImageUrl(url);
-                newPostPicture.setUpdatedAt(System.currentTimeMillis());
-                postPictures.add(newPostPicture);
-            }else{
-                newPostPicture.setImageUrl(url);
-                newPostPicture.setCreatedAt(System.currentTimeMillis());
-                postPictures.add(newPostPicture);
-            }
+            PostPicture newPostPicture = PostPicture.builder()
+                    .imageUrl(url)
+                    .createdAt(System.currentTimeMillis())
+                    .build();
             return postPictureRepository.save(newPostPicture);
         }catch (Exception e) {
             throw new FileStorageException("Failed to upload picture: " + e.getMessage());

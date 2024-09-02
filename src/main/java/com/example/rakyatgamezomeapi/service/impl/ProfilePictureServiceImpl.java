@@ -61,7 +61,7 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
                         .createdAt(System.currentTimeMillis())
                         .build();
             }
-            return profilePictureRepository.save(foundProfilePicture);
+            return profilePictureRepository.saveAndFlush(foundProfilePicture);
         }catch (Exception e){
             throw new FileStorageException("Failed to upload profile picture: " + e.getMessage());
         }

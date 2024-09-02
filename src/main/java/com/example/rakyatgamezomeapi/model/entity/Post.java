@@ -13,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Table(name = "posts")
-@EqualsAndHashCode(exclude = {"user", "tag", "pictures"})
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -38,7 +37,7 @@ public class Post {
     @JsonIgnore
     private List<Comment> comments;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<VotePost> votes;
 

@@ -32,7 +32,6 @@ public class FileUploadUtil {
     }
 
     public static String getFileName(String name){
-        String format = String.format(FILE_NAME_FORMAT, name);
-        return format;
+        return String.format(FILE_NAME_FORMAT, name);
     }
 }

@@ -69,9 +69,11 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
-    @PostMapping
-    public ResponseEntity<CommonResponse<PostResponse>> createPost(@Valid @RequestBody PostCreateRequest postCreateRequest) {
-        PostResponse post = postService.createPost(postCreateRequest);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CommonResponse<PostResponse>> createPost(
+            @Valid @RequestPart("postCreateRequest") PostCreateRequest postCreateRequest,
+            @RequestPart("pictures") List<MultipartFile> pictures) {
+        PostResponse post = postService.createPost(postCreateRequest, pictures);
         CommonResponse<PostResponse> commonResponse = CommonResponse.<PostResponse>builder()
                 .status(HttpStatus.CREATED.value())
                 .message("Post Created Successfully")
@@ -80,24 +82,15 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
     }
 
-    @PutMapping
-    public ResponseEntity<CommonResponse<PostResponse>> updatePost(@RequestBody PostUpdateRequest postUpdateRequest) {
-        PostResponse post = postService.updatePost(postUpdateRequest);
+    @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CommonResponse<PostResponse>> updatePost(
+            @RequestPart("postUpdateRequest") PostUpdateRequest postUpdateRequest,
+            @RequestPart("pictures") List<MultipartFile> pictures) {
+        PostResponse post = postService.updatePost(postUpdateRequest, pictures);
         CommonResponse<PostResponse> commonResponse = CommonResponse.<PostResponse>builder()
                 .status(HttpStatus.OK.value())
                 .message("Post Updated Successfully")
                 .data(post)
-                .build();
-        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
-    }
-
-    @PatchMapping(value = "/{id}/pictures", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CommonResponse<PostResponse>> updatePictures(@PathVariable("id") String id, @RequestParam("pictures") List<MultipartFile> files) {
-        PostResponse postResponse = postService.uploadPictures(files, id);
-        CommonResponse<PostResponse> commonResponse = CommonResponse.<PostResponse>builder()
-                .status(HttpStatus.OK.value())
-                .message("Post pictures upload Successfully")
-                .data(postResponse)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
