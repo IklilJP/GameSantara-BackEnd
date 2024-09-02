@@ -11,4 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProfilePictureResponse {
     private String imageUrl;
+    private Long createdAt;
+    private Long updatedAt;
 }

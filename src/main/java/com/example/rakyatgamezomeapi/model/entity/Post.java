@@ -2,10 +2,7 @@ package com.example.rakyatgamezomeapi.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Table(name = "posts")
+@EqualsAndHashCode(exclude = {"user", "tag", "pictures"})
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -23,6 +21,7 @@ public class Post {
 
     private String title;
 
+    @Lob
     private String body;
 
     @ManyToOne
@@ -42,6 +41,10 @@ public class Post {
     @OneToMany(mappedBy = "post")
     @JsonIgnore
     private List<VotePost> votes;
+
+    @OneToMany(mappedBy = "post")
+    @JsonIgnore
+    private List<PostPicture> pictures;
 
     @Column(name = "created_at")
     private Long createdAt;

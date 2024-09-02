@@ -4,14 +4,18 @@ import com.example.rakyatgamezomeapi.constant.EVoteType;
 import com.example.rakyatgamezomeapi.model.dto.request.PostCreateRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.PostUpdateRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.SearchPostRequest;
+import com.example.rakyatgamezomeapi.model.dto.response.PostPictureResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.PostResponse;
 import com.example.rakyatgamezomeapi.model.entity.Post;
+import com.example.rakyatgamezomeapi.model.entity.PostPicture;
 import com.example.rakyatgamezomeapi.model.entity.Tag;
 import com.example.rakyatgamezomeapi.model.entity.User;
 import com.example.rakyatgamezomeapi.repository.PostRepository;
+import com.example.rakyatgamezomeapi.service.PostPictureService;
 import com.example.rakyatgamezomeapi.service.PostService;
 import com.example.rakyatgamezomeapi.service.TagService;
 import com.example.rakyatgamezomeapi.service.UserService;
+import com.example.rakyatgamezomeapi.utils.FileUploadUtil;
 import com.example.rakyatgamezomeapi.utils.exceptions.AuthenticationException;
 import com.example.rakyatgamezomeapi.utils.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +24,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -28,6 +34,7 @@ import java.util.Objects;
 public class PostServiceImpl implements PostService {
     private final TagService tagService;
     private final PostRepository postRepository;
+    private final PostPictureService postPictureService;
     private final UserService userService;
 
     @Transactional(readOnly = true)
@@ -84,6 +91,21 @@ public class PostServiceImpl implements PostService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
+    public PostResponse uploadPictures(List<MultipartFile> files, String postId) {
+        Post post = findPostByIdOrThrow(postId);
+        List<PostPicture> foundPictures = post.getPictures();
+        files.forEach(file -> {
+            FileUploadUtil.assertAllowedExtension(file, FileUploadUtil.IMAGE_PATTERN);
+            PostPicture picture = postPictureService.uploadPicture(file, postId);
+            foundPictures.add(picture);
+            post.setPictures(foundPictures);
+            post.setUpdatedAt(System.currentTimeMillis());
+        });
+        return toResponse(postRepository.saveAndFlush(post));
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @Override
     public void deletePost(String id) {
         User user = userService.getUserByTokenForTsx();
         Post post = this.findPostByIdOrThrow(id);
@@ -99,11 +121,12 @@ public class PostServiceImpl implements PostService {
                 .user(post.getUser().getUsername())
                 .title(post.getTitle())
                 .body(post.getBody())
+                .pictures(post.getPictures()!= null ? post.getPictures().stream().map(PostPictureResponse::of).toList() : null)
                 .tagName(post.getTag() != null ? post.getTag().getName() : "No Tag")
                 .tagImgUrl(post.getTag() != null ? post.getTag().getImgUrl() : "No Image Tag")
-                .commentsCount((long) post.getComments().size())
-                .upVotesCount(post.getVotes().stream().filter(votePost -> votePost.getVoteType() == EVoteType.UPVOTE).count())
-                .downVotesCount(post.getVotes().stream().filter(votePost -> votePost.getVoteType() == EVoteType.DOWNVOTE).count())
+                .commentsCount(post.getComments() != null ? (long) post.getComments().size(): 0)
+                .upVotesCount(post.getVotes() != null ? post.getVotes().stream().filter(votePost -> votePost.getVoteType() == EVoteType.UPVOTE).count() : 0)
+                .downVotesCount(post.getVotes() != null ? post.getVotes().stream().filter(votePost -> votePost.getVoteType() == EVoteType.DOWNVOTE).count() : 0)
                 .createAt(post.getCreatedAt())
                 .updateAt(post.getUpdatedAt())
                 .build();

@@ -12,8 +12,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -85,6 +87,17 @@ public class PostController {
                 .status(HttpStatus.OK.value())
                 .message("Post Updated Successfully")
                 .data(post)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    }
+
+    @PatchMapping(value = "/{id}/pictures", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CommonResponse<PostResponse>> updatePictures(@PathVariable("id") String id, @RequestParam("pictures") List<MultipartFile> files) {
+        PostResponse postResponse = postService.uploadPictures(files, id);
+        CommonResponse<PostResponse> commonResponse = CommonResponse.<PostResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("Post pictures upload Successfully")
+                .data(postResponse)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }

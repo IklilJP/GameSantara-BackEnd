@@ -51,13 +51,18 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
             );
             Map result = cloudinary.uploader().upload(file.getBytes(), param1);
             final String url = (String) result.get("secure_url");
-            ProfilePicture profilePicture = ProfilePicture.builder()
-                    .image(url)
-                    .createdAt(System.currentTimeMillis())
-                    .build();
-            return profilePictureRepository.saveAndFlush(profilePicture);
+            ProfilePicture foundProfilePicture = profilePictureRepository.findByUserId(userId).orElse(null);
+            if(foundProfilePicture != null) {
+                foundProfilePicture.setImage(url);
+                foundProfilePicture.setUpdatedAt(System.currentTimeMillis());
+            }else {
+                foundProfilePicture = ProfilePicture.builder()
+                        .image(url)
+                        .createdAt(System.currentTimeMillis())
+                        .build();
+            }
+            return profilePictureRepository.save(foundProfilePicture);
         }catch (Exception e){
-            e.printStackTrace();  // untuk melihat pesan error yang lebih detail
             throw new FileStorageException("Failed to upload profile picture: " + e.getMessage());
         }
     }

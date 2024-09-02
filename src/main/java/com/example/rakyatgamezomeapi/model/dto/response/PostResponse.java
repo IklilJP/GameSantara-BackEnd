@@ -17,6 +17,7 @@ public class PostResponse {
     private String title;
     private String body;
     private String user;
+    private List<PostPictureResponse> pictures;
     private String tagName;
     private String tagImgUrl;
     private Long upVotesCount;
