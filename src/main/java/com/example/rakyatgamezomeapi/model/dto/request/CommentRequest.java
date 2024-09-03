@@ -16,7 +16,5 @@ public class CommentRequest {
 
     @NotBlank
     private String content;
-
-    private String username;
     private String parentCommentId;
 }

@@ -86,4 +86,13 @@ public class GlobalExceptionController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(commonResponse);
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<CommonResponse<String>> handleAuthenticationException(AuthenticationException ex) {
+        CommonResponse<String> commonResponse = CommonResponse.<String>builder()
+                .status(HttpStatus.UNAUTHORIZED.value())
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(commonResponse);
+    }
+
 }

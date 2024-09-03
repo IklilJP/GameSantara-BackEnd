@@ -5,6 +5,7 @@ import com.example.rakyatgamezomeapi.model.dto.request.TagRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.TagResponse;
 import com.example.rakyatgamezomeapi.service.TagService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(APIUrl.TAGS_API)
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class TagController {
 

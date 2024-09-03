@@ -5,6 +5,7 @@ import com.example.rakyatgamezomeapi.model.dto.request.FollowRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.FollowResponse;
 import com.example.rakyatgamezomeapi.service.FollowService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(APIUrl.FOLLOW_API)
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class FollowController {
     private final FollowService followService;

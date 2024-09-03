@@ -16,4 +16,6 @@ public interface UserService {
     UserResponse updateUserFullNameByToken(UserFullNameRequest userRequest);
     UserResponse updateUserUsernameByToken(UserUsernameRequest userRequest);
     UserResponse updateUserProfilePicture(MultipartFile profilePicture);
+    UserResponse banUser(String id);
+    UserResponse unbanUser(String id);
 }

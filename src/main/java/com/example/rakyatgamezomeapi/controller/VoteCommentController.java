@@ -6,6 +6,7 @@ import com.example.rakyatgamezomeapi.model.dto.request.VoteCommentRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.VoteCommentResponse;
 import com.example.rakyatgamezomeapi.service.VoteCommentService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(APIUrl.VOTE_COMMENTS_API)
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class VoteCommentController {
     private final VoteCommentService voteCommentService;

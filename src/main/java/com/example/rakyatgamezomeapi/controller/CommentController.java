@@ -5,6 +5,7 @@ import com.example.rakyatgamezomeapi.model.dto.request.CommentRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.CommentResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.service.CommentService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(APIUrl.COMMENT_API)
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class CommentController {
     private final CommentService commentService;
@@ -36,7 +38,7 @@ public class CommentController {
         CommentResponse commentResponse = commentService.getCommentById(id);
         CommonResponse<CommentResponse> responseCommonResponse = CommonResponse.<CommentResponse>builder()
                 .status(HttpStatus.OK.value())
-                .message("Comment retrieved successfully")
+                .message("Comment were retrieved successfully")
                 .data(commentResponse)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(responseCommonResponse);
@@ -47,7 +49,7 @@ public class CommentController {
         CommentResponse commentResponse = commentService.addComment(commentRequest);
         CommonResponse<CommentResponse> commonResponse = CommonResponse.<CommentResponse>builder()
                 .status(HttpStatus.CREATED.value())
-                .message("Comment created successfully")
+                .message("Comment were created successfully")
                 .data(commentResponse)
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
@@ -58,7 +60,7 @@ public class CommentController {
         CommentResponse commentResponse = commentService.addChildComment(commentRequest);
         CommonResponse<CommentResponse> commonResponse = CommonResponse.<CommentResponse>builder()
                 .status(HttpStatus.CREATED.value())
-                .message("Comment child created successfully")
+                .message("Comment child were created successfully")
                 .data(commentResponse)
                 .build();
         return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
@@ -68,11 +70,11 @@ public class CommentController {
     public ResponseEntity<CommonResponse<CommentResponse>> updateComment(@Valid @RequestBody CommentRequest commentRequest) {
         CommentResponse commentResponse = commentService.updateComment(commentRequest);
         CommonResponse<CommentResponse> commonResponse = CommonResponse.<CommentResponse>builder()
-                .status(HttpStatus.CREATED.value())
-                .message("Comment child created successfully")
+                .status(HttpStatus.OK.value())
+                .message("Comment were updated successfully")
                 .data(commentResponse)
                 .build();
-        return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
     }
 
     @DeleteMapping("/{id}")

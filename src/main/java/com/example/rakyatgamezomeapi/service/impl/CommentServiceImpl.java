@@ -1,5 +1,6 @@
 package com.example.rakyatgamezomeapi.service.impl;
 
+import com.example.rakyatgamezomeapi.constant.ERole;
 import com.example.rakyatgamezomeapi.model.dto.request.CommentRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.CommentResponse;
 import com.example.rakyatgamezomeapi.model.entity.Comment;
@@ -52,7 +53,7 @@ public class CommentServiceImpl implements CommentService {
                 .content(request.getContent())
                 .createdAt(System.currentTimeMillis())
                 .build();
-        return toResponse(commentRepository.save(comment));
+        return toResponse(commentRepository.saveAndFlush(comment));
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -69,7 +70,7 @@ public class CommentServiceImpl implements CommentService {
                 .content(request.getContent())
                 .createdAt(System.currentTimeMillis())
                 .build();
-        return toResponse(commentRepository.save(comment));
+        return toResponse(commentRepository.saveAndFlush(comment));
     }
 
     @Override
@@ -77,13 +78,13 @@ public class CommentServiceImpl implements CommentService {
         User user = userService.getUserByTokenForTsx();
         Comment comment = findCommentByIdOrThrow(request.getId());
 
-        if(!comment.getUser().getId().equals(user.getId())) {
+        if(!comment.getUser().getId().equals(user.getId()) || !(user.getRole().getName().equals(ERole.ADMIN))) {
             throw new AuthenticationException("You don't have permission to update this comment");
         }
 
         comment.setContent(request.getContent());
         comment.setUpdatedAt(System.currentTimeMillis());
-        return toResponse(commentRepository.save(comment));
+        return toResponse(commentRepository.saveAndFlush(comment));
     }
 
     @Override
@@ -91,7 +92,7 @@ public class CommentServiceImpl implements CommentService {
         User user = userService.getUserByTokenForTsx();
         Comment comment = findCommentByIdOrThrow(id);
 
-        if(!comment.getUser().getId().equals(user.getId())) {
+        if(!comment.getUser().getId().equals(user.getId()) || !(user.getRole().getName().equals(ERole.ADMIN))) {
             throw new AuthenticationException("You don't have permission to delete this comment");
         }
 
@@ -106,8 +107,9 @@ public class CommentServiceImpl implements CommentService {
         return CommentResponse.builder()
                 .id(comment.getId())
                 .content(comment.getContent())
+                .postId(comment.getPost().getId())
                 .username(comment.getUser().getUsername())
-                .parentCommentId(comment.getParentComment().getId())
+                .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
                 .build();
     }
 }

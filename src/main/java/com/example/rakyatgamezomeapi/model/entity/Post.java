@@ -33,7 +33,7 @@ public class Post {
     @JsonIgnore
     private Tag tag;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Comment> comments;
 
@@ -41,7 +41,7 @@ public class Post {
     @JsonIgnore
     private List<VotePost> votes;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<PostPicture> pictures;
 

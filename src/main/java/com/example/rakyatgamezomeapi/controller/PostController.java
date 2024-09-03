@@ -8,6 +8,7 @@ import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.PagingResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.PostResponse;
 import com.example.rakyatgamezomeapi.service.PostService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(APIUrl.POST_API)
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
@@ -72,7 +74,7 @@ public class PostController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse<PostResponse>> createPost(
             @Valid @RequestPart("postCreateRequest") PostCreateRequest postCreateRequest,
-            @RequestPart("pictures") List<MultipartFile> pictures) {
+            @RequestPart(value = "pictures", required = false) List<MultipartFile> pictures) {
         PostResponse post = postService.createPost(postCreateRequest, pictures);
         CommonResponse<PostResponse> commonResponse = CommonResponse.<PostResponse>builder()
                 .status(HttpStatus.CREATED.value())
@@ -85,7 +87,7 @@ public class PostController {
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<CommonResponse<PostResponse>> updatePost(
             @RequestPart("postUpdateRequest") PostUpdateRequest postUpdateRequest,
-            @RequestPart("pictures") List<MultipartFile> pictures) {
+            @RequestPart(value = "pictures", required = false) List<MultipartFile> pictures) {
         PostResponse post = postService.updatePost(postUpdateRequest, pictures);
         CommonResponse<PostResponse> commonResponse = CommonResponse.<PostResponse>builder()
                 .status(HttpStatus.OK.value())

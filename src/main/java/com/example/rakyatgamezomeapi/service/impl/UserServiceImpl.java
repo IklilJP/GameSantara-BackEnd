@@ -88,6 +88,22 @@ public class UserServiceImpl implements UserService {
         return toResponse(userRepository.saveAndFlush(user));
     }
 
+    @Override
+    public UserResponse banUser(String id) {
+        User user = findByIdOrThrowNotFound(id);
+        user.setIsActive(false);
+        user.setUpdatedAt(System.currentTimeMillis());
+        return toResponse(userRepository.saveAndFlush(user));
+    }
+
+    @Override
+    public UserResponse unbanUser(String id) {
+        User user = findByIdOrThrowNotFound(id);
+        user.setIsActive(true);
+        user.setUpdatedAt(System.currentTimeMillis());
+        return toResponse(userRepository.saveAndFlush(user));
+    }
+
     private User findByIdOrThrowNotFound(String id) {
         return userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, ResponseMessage.ERROR_NOT_FOUND));
     }

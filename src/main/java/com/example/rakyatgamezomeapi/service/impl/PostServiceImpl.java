@@ -1,21 +1,15 @@
 package com.example.rakyatgamezomeapi.service.impl;
 
+import com.example.rakyatgamezomeapi.constant.ERole;
 import com.example.rakyatgamezomeapi.constant.EVoteType;
 import com.example.rakyatgamezomeapi.model.dto.request.PostCreateRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.PostUpdateRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.SearchPostRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.PostPictureResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.PostResponse;
-import com.example.rakyatgamezomeapi.model.entity.Post;
-import com.example.rakyatgamezomeapi.model.entity.PostPicture;
-import com.example.rakyatgamezomeapi.model.entity.Tag;
-import com.example.rakyatgamezomeapi.model.entity.User;
+import com.example.rakyatgamezomeapi.model.entity.*;
 import com.example.rakyatgamezomeapi.repository.PostRepository;
-import com.example.rakyatgamezomeapi.service.PostPictureService;
-import com.example.rakyatgamezomeapi.service.PostService;
-import com.example.rakyatgamezomeapi.service.TagService;
-import com.example.rakyatgamezomeapi.service.UserService;
-import com.example.rakyatgamezomeapi.utils.FileUploadUtil;
+import com.example.rakyatgamezomeapi.service.*;
 import com.example.rakyatgamezomeapi.utils.exceptions.AuthenticationException;
 import com.example.rakyatgamezomeapi.utils.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +37,9 @@ public class PostServiceImpl implements PostService {
     public Page<PostResponse> getAllPosts(SearchPostRequest request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         Page<Post> allPosts = postRepository.findAllByTitleContainingOrBodyContaining(request.getQuery(), pageable);
+        if(allPosts.isEmpty()) {
+            throw new ResourceNotFoundException("All posts is empty");
+        }
         return allPosts.map(this::toResponse);
     }
 
@@ -74,11 +71,13 @@ public class PostServiceImpl implements PostService {
         post = postRepository.save(post);
 
         Post finalPost = post;
-        files.forEach(file -> {
-            PostPicture postPicture = postPictureService.uploadPicture(file, finalPost.getId());
-            postPicture.setPost(finalPost);
-            postPictureList.add(postPicture);
-        });
+        if(files != null && !files.isEmpty()) {
+            files.forEach(file -> {
+                PostPicture postPicture = postPictureService.uploadPicture(file, finalPost.getId());
+                postPicture.setPost(finalPost);
+                postPictureList.add(postPicture);
+            });
+        }
 
         return toResponse(postRepository.saveAndFlush(finalPost));
     }
@@ -91,14 +90,17 @@ public class PostServiceImpl implements PostService {
         Tag tag = tagService.getTagByIdForTrx(request.getTagId());
         List<PostPicture> postPictureList = post.getPictures() == null ? new ArrayList<>() : post.getPictures();
 
-        if(!Objects.equals(user.getId(), post.getUser().getId())) {
+        if(!Objects.equals(user.getId(), post.getUser().getId()) || !(user.getRole().getName().equals(ERole.ADMIN))) {
             throw new AuthenticationException("You don't have permission to update this post");
         }
 
-        files.forEach(file -> {
-            PostPicture postPicture = postPictureService.uploadPicture(file, post.getId());
-            postPictureList.add(postPicture);
-        });
+        if(files != null && !files.isEmpty()) {
+            files.forEach(file -> {
+                PostPicture postPicture = postPictureService.uploadPicture(file, post.getId());
+                postPicture.setPost(post);
+                postPictureList.add(postPicture);
+            });
+        }
 
         post.setTitle(request.getTitle());
         post.setBody(request.getBody());
@@ -113,8 +115,8 @@ public class PostServiceImpl implements PostService {
     public void deletePost(String id) {
         User user = userService.getUserByTokenForTsx();
         Post post = this.findPostByIdOrThrow(id);
-        if(!Objects.equals(user.getId(), post.getUser().getId())) {
-            throw new AuthenticationException("You don't have permission to update this post");
+        if(!(user.getId().equals(post.getUser().getId())) && !(user.getRole().getName().equals(ERole.ADMIN))) {
+            throw new AuthenticationException("You don't have permission to delete this post");
         }
         postRepository.delete(post);
     }
@@ -123,6 +125,7 @@ public class PostServiceImpl implements PostService {
         return PostResponse.builder()
                 .id(post.getId())
                 .user(post.getUser().getUsername())
+                .profilePictureUrl(post.getUser().getProfilePicture() == null ? null : post.getUser().getProfilePicture().getImage())
                 .title(post.getTitle())
                 .body(post.getBody())
                 .pictures(post.getPictures()!= null ? post.getPictures().stream().map(PostPictureResponse::of).toList() : null)

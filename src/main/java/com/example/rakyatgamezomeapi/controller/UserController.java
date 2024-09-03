@@ -8,6 +8,7 @@ import com.example.rakyatgamezomeapi.model.dto.request.UserUsernameRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.UserResponse;
 import com.example.rakyatgamezomeapi.service.UserService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping(APIUrl.USER_API)
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
@@ -83,6 +85,28 @@ public class UserController {
         CommonResponse<UserResponse> commonResponse = CommonResponse.<UserResponse>builder()
                 .status(HttpStatus.OK.value())
                 .message("User profile picture updated successfully")
+                .data(userResponse)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    }
+
+    @PatchMapping("/ban-user/{id}")
+    public ResponseEntity<CommonResponse<UserResponse>> banUser(@PathVariable String id) {
+        UserResponse userResponse = userService.banUser(id);
+        CommonResponse<UserResponse> commonResponse = CommonResponse.<UserResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("User has been banned successfully")
+                .data(userResponse)
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    }
+
+    @PatchMapping("/unban-user/{id}")
+    public ResponseEntity<CommonResponse<UserResponse>> unbanUser(@PathVariable String id) {
+        UserResponse userResponse = userService.unbanUser(id);
+        CommonResponse<UserResponse> commonResponse = CommonResponse.<UserResponse>builder()
+                .status(HttpStatus.OK.value())
+                .message("User has been unbanned successfully")
                 .data(userResponse)
                 .build();
         return ResponseEntity.status(HttpStatus.OK).body(commonResponse);

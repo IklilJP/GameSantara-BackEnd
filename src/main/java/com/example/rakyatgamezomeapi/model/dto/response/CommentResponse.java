@@ -1,5 +1,6 @@
 package com.example.rakyatgamezomeapi.model.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,9 @@ public class CommentResponse {
     private String id;
     private String content;
     private String username;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String parentCommentId;
+
     private String postId;
 }
