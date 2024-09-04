@@ -15,6 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class VotePostServiceImpl implements VotePostService {
@@ -35,15 +37,15 @@ public class VotePostServiceImpl implements VotePostService {
                     .user(user)
                     .createdAt(System.currentTimeMillis())
                     .build();
-        }else if(votePost.getVoteType() == voteType) {
+            return toResponse(votePostRepository.saveAndFlush(votePost));
+        }else if(votePost.getVoteType() == voteType && votePost.getUser().getId().equals(user.getId())) {
             votePostRepository.delete(votePost);
             return null;
         }else{
             votePost.setVoteType(voteType);
             votePost.setUpdatedAt(System.currentTimeMillis());
+            return toResponse(votePostRepository.saveAndFlush(votePost));
         }
-
-        return toResponse(votePostRepository.saveAndFlush(votePost));
     }
 
     private VotePostResponse toResponse(VotePost votePost) {

@@ -31,7 +31,8 @@ public class PostController {
     public ResponseEntity<CommonResponse<List<PostResponse>>> getAllPosts(
             @RequestParam(name = "page", defaultValue = "1") Integer page,
             @RequestParam(name = "size", defaultValue = "10") Integer size,
-            @RequestParam(name = "q", defaultValue = "") String query
+            @RequestParam(name = "q", defaultValue = "") String query,
+            @RequestParam(name = "by", defaultValue = "") String by
     ) {
         SearchPostRequest request = SearchPostRequest.builder()
                 .page(Math.max(page - 1, 0))
@@ -39,7 +40,13 @@ public class PostController {
                 .query(query)
                 .build();
 
-        Page<PostResponse> posts = postService.getAllPosts(request);
+        Page<PostResponse> posts = switch (by) {
+            case "latest" -> postService.getAllLatestPosts(request);
+            case "trend" -> postService.getAllTrendingPosts(request);
+            case "user" -> postService.getAllUserContextPosts(request);
+            default -> postService.getAllPosts(request);
+        };
+
         PagingResponse pagingResponse = PagingResponse.builder()
                 .totalPages(posts.getTotalPages())
                 .totalElements(posts.getTotalElements())

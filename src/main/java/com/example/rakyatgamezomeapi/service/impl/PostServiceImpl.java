@@ -13,9 +13,7 @@ import com.example.rakyatgamezomeapi.service.*;
 import com.example.rakyatgamezomeapi.utils.exceptions.AuthenticationException;
 import com.example.rakyatgamezomeapi.utils.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,6 +42,44 @@ public class PostServiceImpl implements PostService {
         return allPosts.map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Page<PostResponse> getAllLatestPosts(SearchPostRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), Sort.by("createdAt").descending());
+        Page<Post> allPosts = postRepository.findAllByTitleContainingOrBodyContaining(request.getQuery(), pageable);
+        if(allPosts.isEmpty()) {
+            throw new ResourceNotFoundException("All posts is empty");
+        }
+        return allPosts.map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<PostResponse> getAllTrendingPosts(SearchPostRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Post> allPosts = postRepository.findAllByTitleContainingOrBodyContaining(request.getQuery(), pageable);
+        if(allPosts.isEmpty()) {
+            throw new ResourceNotFoundException("All posts is empty");
+        }
+        return allPosts.stream()
+                .sorted((a, b) -> (b.getVotes().size() + b.getComments().size()) - (a.getVotes().size() + a.getComments().size()))
+                .map(this::toResponse)
+                .collect(Collectors.collectingAndThen(Collectors.toList(),
+                        list -> new PageImpl<>(list, pageable, list.size())));
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<PostResponse> getAllUserContextPosts(SearchPostRequest request) {
+        User user = userService.getUserByTokenForTsx();
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Post> allPosts = postRepository.findAllByUserId(user.getId(), pageable);
+        if(allPosts.isEmpty()) {
+            throw new ResourceNotFoundException("All posts is empty");
+        }
+        return allPosts.map(this::toResponse);
+    }
+
     @Override
     public PostResponse getPostById(String id) {
         return toResponse(findPostByIdOrThrow(id));
@@ -53,7 +90,7 @@ public class PostServiceImpl implements PostService {
         return findPostByIdOrThrow(id);
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = ResourceNotFoundException.class)
     @Override
     public PostResponse createPost(PostCreateRequest request, List<MultipartFile> files) {
         User user = userService.getUserByTokenForTsx();
@@ -82,13 +119,13 @@ public class PostServiceImpl implements PostService {
         return toResponse(postRepository.saveAndFlush(finalPost));
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = ResourceNotFoundException.class)
     @Override
     public PostResponse updatePost(PostUpdateRequest request, List<MultipartFile> files) {
         User user = userService.getUserByTokenForTsx();
         Post post = findPostByIdOrThrow(request.getId());
         Tag tag = tagService.getTagByIdForTrx(request.getTagId());
-        List<PostPicture> postPictureList = post.getPictures() == null ? new ArrayList<>() : post.getPictures();
+        List<PostPicture> postPictureList = new ArrayList<>();
 
         if(!Objects.equals(user.getId(), post.getUser().getId()) || !(user.getRole().getName().equals(ERole.ADMIN))) {
             throw new AuthenticationException("You don't have permission to update this post");
@@ -110,7 +147,7 @@ public class PostServiceImpl implements PostService {
         return toResponse(postRepository.saveAndFlush(post));
     }
 
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional(rollbackFor = ResourceNotFoundException.class)
     @Override
     public void deletePost(String id) {
         User user = userService.getUserByTokenForTsx();
@@ -119,6 +156,16 @@ public class PostServiceImpl implements PostService {
             throw new AuthenticationException("You don't have permission to delete this post");
         }
         postRepository.delete(post);
+    }
+
+    private boolean isUpVoted(){
+        User user = userService.getUserByTokenForTsx();
+        return postRepository.findByVotesUserIdAndVotesVoteType(user != null ? user.getId(): "not found", EVoteType.UPVOTE).orElse(null) != null;
+    }
+
+    private boolean isDownVoted(){
+        User user = userService.getUserByTokenForTsx();
+        return postRepository.findByVotesUserIdAndVotesVoteType(user != null ? user.getId(): "not found", EVoteType.DOWNVOTE).orElse(null) != null;
     }
 
     private PostResponse toResponse(Post post) {
@@ -132,6 +179,8 @@ public class PostServiceImpl implements PostService {
                 .tagName(post.getTag() != null ? post.getTag().getName() : "No Tag")
                 .tagImgUrl(post.getTag() != null ? post.getTag().getImgUrl() : "No Image Tag")
                 .commentsCount(post.getComments() != null ? (long) post.getComments().size(): 0)
+                .isUpVoted(isUpVoted())
+                .isDownVoted(isDownVoted())
                 .upVotesCount(post.getVotes() != null ? post.getVotes().stream().filter(votePost -> votePost.getVoteType() == EVoteType.UPVOTE).count() : 0)
                 .downVotesCount(post.getVotes() != null ? post.getVotes().stream().filter(votePost -> votePost.getVoteType() == EVoteType.DOWNVOTE).count() : 0)
                 .createAt(post.getCreatedAt())

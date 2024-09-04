@@ -31,7 +31,7 @@ public class VoteCommentServiceImpl implements VoteCommentService {
                     .user(user)
                     .createdAt(System.currentTimeMillis())
                     .build();
-        }else if(voteComment.getVoteType() == voteType) {
+        }else if(voteComment.getVoteType() == voteType && voteComment.getComment().getId().equals(comment.getId())) {
             voteCommentRepository.delete(voteComment);
             return null;
         }else{

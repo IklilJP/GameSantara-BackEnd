@@ -1,5 +1,6 @@
 package com.example.rakyatgamezomeapi.model.dto.response;
 
+import com.example.rakyatgamezomeapi.constant.EVoteType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +22,8 @@ public class PostResponse {
     private List<PostPictureResponse> pictures;
     private String tagName;
     private String tagImgUrl;
+    private Boolean isUpVoted;
+    private Boolean isDownVoted;
     private Long upVotesCount;
     private Long downVotesCount;
     private Long commentsCount;

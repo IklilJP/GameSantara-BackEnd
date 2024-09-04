@@ -5,7 +5,9 @@ import com.example.rakyatgamezomeapi.model.dto.response.TagResponse;
 import com.example.rakyatgamezomeapi.model.entity.Tag;
 import com.example.rakyatgamezomeapi.repository.TagRepository;
 import com.example.rakyatgamezomeapi.service.TagService;
+import com.example.rakyatgamezomeapi.utils.exceptions.ResourceNotFoundException;
 import com.example.rakyatgamezomeapi.utils.exceptions.TagAlreadyExistException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -15,10 +17,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
 
-    @Autowired
-    private TagRepository tagRepository;
+    private final TagRepository tagRepository;
 
     @Override
     public TagResponse createTag(TagRequest tagRequest) {
@@ -37,7 +39,7 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagResponse updateTag(TagRequest tagRequest) {
-        Tag tag = tagRepository.findById(tagRequest.getId()).orElseThrow(() -> new RuntimeException("Tag not found"));
+        Tag tag = tagRepository.findById(tagRequest.getId()).orElseThrow(() -> new ResourceNotFoundException("Tag not found"));
         tag.setName(tagRequest.getName().trim());
         tag.setImgUrl(tagRequest.getImgurl());
         tag.setUpdatedAt(Instant.now().toEpochMilli());
@@ -51,13 +53,13 @@ public class TagServiceImpl implements TagService {
 
     @Override
     public TagResponse getTagById(String id) {
-        Tag tag = tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Tag not found"));
+        Tag tag = tagRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tag not found"));
         return mapToResponse(tag);
     }
 
     @Override
     public Tag getTagByIdForTrx(String id) {
-        return tagRepository.findById(id).orElseThrow(() -> new RuntimeException("Tag not found"));
+        return tagRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tag not found"));
     }
 
     @Override

@@ -13,6 +13,9 @@ import java.util.List;
 
 public interface PostService {
     Page<PostResponse> getAllPosts(SearchPostRequest request);
+    Page<PostResponse> getAllLatestPosts(SearchPostRequest request);
+    Page<PostResponse> getAllTrendingPosts(SearchPostRequest request);
+    Page<PostResponse> getAllUserContextPosts(SearchPostRequest request);
     PostResponse getPostById(String id);
     Post getPostByIdForTrx(String id);
     PostResponse createPost(PostCreateRequest request, List<MultipartFile> files);
