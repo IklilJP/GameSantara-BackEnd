@@ -15,6 +15,11 @@ public interface PostRepository extends JpaRepository<Post, String> {
             "WHERE p.title LIKE %:query% OR CAST(p.body AS STRING) LIKE %:query% OR t.name LIKE %:query%")
     Page<Post> findAllByTitleContainingOrBodyContaining(@Param("query") String query, Pageable pageable);
 
-    Optional<Post> findByVotesUserIdAndVotesVoteType(String id, EVoteType voteType);
+    @Query("SELECT p FROM Post p LEFT JOIN p.tag t " +
+            "WHERE p.title LIKE %:query% OR CAST(p.body AS STRING) LIKE %:query% OR t.name LIKE %:query% " +
+            "ORDER BY (SIZE(p.votes) + SIZE(p.comments)) DESC")
+    Page<Post> findAllAndSortByTrending(@Param("query") String query, Pageable pageable);
+
+    Optional<Post> findByIdAndVotesUserIdAndVotesVoteType(String id, String userId, EVoteType voteType);
     Page<Post> findAllByUserId(String userId, Pageable pageable);
 }

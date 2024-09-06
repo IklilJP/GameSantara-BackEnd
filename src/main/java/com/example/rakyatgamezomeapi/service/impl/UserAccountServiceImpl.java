@@ -18,7 +18,7 @@ public class UserAccountServiceImpl implements UserAccountService {
     private final UserRepository userRepository;
     @Override
     public UserAccount loadUserById(String id) {
-        User user =userRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("username not found"));
+        User user =userRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("username not found"));
         return UserAccount.builder()
                 .id(user.getId())
                 .email(user.getEmail())
@@ -45,7 +45,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user =userRepository.findByEmail(username).orElseThrow(() -> new ResourceNotFoundException("username not found"));
+        User user =userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("username not found"));
         return UserAccount.builder()
                 .id(user.getId())
                 .email(user.getEmail())

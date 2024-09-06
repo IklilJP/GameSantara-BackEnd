@@ -9,4 +9,6 @@ public class APIUrl {
     public static final String VOTE_POSTS_API = "/api/vote-posts";
     public static final String VOTE_COMMENTS_API = "/api/vote-comments";
     public static final String FOLLOW_API = "/api/follow";
+    public static final String PRODUCT_COIN_API = "/api/product-coin";
+    public static final String TRANSACTION_API = "/api/transaction";
 }

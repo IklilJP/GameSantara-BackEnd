@@ -18,6 +18,7 @@ public class PostResponse {
     private String title;
     private String body;
     private String user;
+    private String userId;
     private String profilePictureUrl;
     private List<PostPictureResponse> pictures;
     private String tagName;

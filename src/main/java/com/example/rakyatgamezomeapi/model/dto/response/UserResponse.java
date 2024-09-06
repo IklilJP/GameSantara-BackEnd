@@ -19,6 +19,8 @@ public class UserResponse {
     private String bio;
     private Long followersCount;
     private Long followingsCount;
+    private Long upVotesCount;
+    private Long commentsCount;
     private Long createdAt;
     private Long updatedAt;
 }

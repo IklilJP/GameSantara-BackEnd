@@ -27,9 +27,9 @@ public class VotePostServiceImpl implements VotePostService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public VotePostResponse vote(String postTargetId, EVoteType voteType) {
-        VotePost votePost = votePostRepository.findByPostId(postTargetId).orElse(null);
         Post post = postService.getPostByIdForTrx(postTargetId);
         User user = userService.getUserByTokenForTsx();
+        VotePost votePost = votePostRepository.findByPostIdAndUserId(postTargetId, user.getId()  ).orElse(null);
         if (votePost == null) {
             votePost = VotePost.builder()
                     .post(post)

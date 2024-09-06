@@ -35,7 +35,8 @@ public class FollowServiceImpl implements FollowService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void unfollow(String userTargetId) {
-        Follow followingTarget = followRepository.findByFollowingUserId(userTargetId)
+        User userAuth = userService.getUserByTokenForTsx();
+        Follow followingTarget = followRepository.findByFollowingUserIdAndFollowedUserId(userTargetId, userAuth.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Following user not found"));
         followRepository.delete(followingTarget);
     }

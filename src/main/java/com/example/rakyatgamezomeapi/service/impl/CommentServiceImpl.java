@@ -1,6 +1,8 @@
 package com.example.rakyatgamezomeapi.service.impl;
 
 import com.example.rakyatgamezomeapi.constant.ERole;
+import com.example.rakyatgamezomeapi.constant.EVoteType;
+import com.example.rakyatgamezomeapi.model.dto.request.CommonPaginationRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.CommentRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.CommentResponse;
 import com.example.rakyatgamezomeapi.model.entity.Comment;
@@ -13,10 +15,11 @@ import com.example.rakyatgamezomeapi.service.UserService;
 import com.example.rakyatgamezomeapi.utils.exceptions.AuthenticationException;
 import com.example.rakyatgamezomeapi.utils.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,10 +28,12 @@ public class CommentServiceImpl implements CommentService {
     private final UserService userService;
     private final PostService postService;
 
+    @Transactional(readOnly = true)
     @Override
-    public List<CommentResponse> getComments() {
-        List<Comment> comments = commentRepository.findAll();
-        return comments.stream().map(this::toResponse).toList();
+    public Page<CommentResponse> getCommentsByPostId(String postId, CommonPaginationRequest request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Comment> comments = commentRepository.findAllByPostId(postId, pageable);
+        return comments.map(this::toResponse);
     }
 
     @Override
@@ -103,12 +108,30 @@ public class CommentServiceImpl implements CommentService {
         return commentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Comment not found"));
     }
 
+    private Boolean isUpvoted(String id) {
+        User user = userService.getUserByTokenForTsx();
+        return commentRepository.findByIdAndUserIdAndVotesVoteType(id, user != null?user.getId() : "notfound", EVoteType.UPVOTE).orElse(null) != null;
+    }
+
+    private Boolean isDownvoted(String id) {
+        User user = userService.getUserByTokenForTsx();
+        return commentRepository.findByIdAndUserIdAndVotesVoteType(id, user != null?user.getId() : "notfound", EVoteType.DOWNVOTE).orElse(null) != null;
+    }
+
     private CommentResponse toResponse(Comment comment) {
         return CommentResponse.builder()
                 .id(comment.getId())
                 .content(comment.getContent())
                 .postId(comment.getPost().getId())
                 .username(comment.getUser().getUsername())
+                .profileImageUrl(comment.getUser().getProfilePicture().getImage())
+                .upVotesCount(comment.getVotes()!=null? comment.getVotes().stream().filter(vote -> vote.getVoteType().equals(EVoteType.UPVOTE)).count():0)
+                .downVotesCount(comment.getVotes()!=null? comment.getVotes().stream().filter(vote -> vote.getVoteType().equals(EVoteType.DOWNVOTE)).count():0)
+                .isUpVoted(isUpvoted(comment.getId()))
+                .isDownVoted(isDownvoted(comment.getId()))
+                .childCommentsCount((long) (comment.getChildComments()!= null? comment.getChildComments().size(): 0))
+                .createdAt(comment.getCreatedAt())
+                .updatedAt(comment.getUpdatedAt())
                 .parentCommentId(comment.getParentComment() != null ? comment.getParentComment().getId() : null)
                 .build();
     }

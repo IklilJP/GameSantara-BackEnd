@@ -44,6 +44,10 @@ public class User {
     @JsonIgnore
     private List<Follow> followings;
 
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<Transaction> transactions;
+
     @OneToMany(mappedBy = "followedUser")
     @JsonIgnore
     private List<Follow> followeds;
@@ -51,6 +55,8 @@ public class User {
     private Boolean isActive = true;
 
     private String bio;
+
+    private Long coin;
 
     @Column(name = "created_at")
     private Long createdAt;

@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
 public interface VoteCommentRepository extends JpaRepository<VoteComment, String> {
-    Optional<VoteComment> findByCommentId(String commentId);
+    Optional<VoteComment> findByCommentIdAndUserId(String commentId, String userId);
 }

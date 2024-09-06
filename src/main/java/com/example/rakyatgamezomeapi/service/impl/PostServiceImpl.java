@@ -57,23 +57,21 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostResponse> getAllTrendingPosts(SearchPostRequest request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Page<Post> allPosts = postRepository.findAllByTitleContainingOrBodyContaining(request.getQuery(), pageable);
-        if(allPosts.isEmpty()) {
+        Page<Post> allPosts = postRepository.findAllAndSortByTrending(request.getQuery(), pageable);
+
+        if (allPosts.isEmpty()) {
             throw new ResourceNotFoundException("All posts is empty");
         }
-        return allPosts.stream()
-                .sorted((a, b) -> (b.getVotes().size() + b.getComments().size()) - (a.getVotes().size() + a.getComments().size()))
-                .map(this::toResponse)
-                .collect(Collectors.collectingAndThen(Collectors.toList(),
-                        list -> new PageImpl<>(list, pageable, list.size())));
+        return allPosts.map(this::toResponse);
     }
+
 
     @Transactional(readOnly = true)
     @Override
     public Page<PostResponse> getAllUserContextPosts(SearchPostRequest request) {
         User user = userService.getUserByTokenForTsx();
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Page<Post> allPosts = postRepository.findAllByUserId(user.getId(), pageable);
+        Page<Post> allPosts = postRepository.findAllByUserId(user != null ? user.getId(): "notfound", pageable);
         if(allPosts.isEmpty()) {
             throw new ResourceNotFoundException("All posts is empty");
         }
@@ -125,7 +123,7 @@ public class PostServiceImpl implements PostService {
         User user = userService.getUserByTokenForTsx();
         Post post = findPostByIdOrThrow(request.getId());
         Tag tag = tagService.getTagByIdForTrx(request.getTagId());
-        List<PostPicture> postPictureList = new ArrayList<>();
+        List<PostPicture> postPictureList = post.getPictures() == null ? new ArrayList<>() : post.getPictures();
 
         if(!Objects.equals(user.getId(), post.getUser().getId()) || !(user.getRole().getName().equals(ERole.ADMIN))) {
             throw new AuthenticationException("You don't have permission to update this post");
@@ -158,20 +156,21 @@ public class PostServiceImpl implements PostService {
         postRepository.delete(post);
     }
 
-    private boolean isUpVoted(){
+    private boolean isUpVoted(String postId){
         User user = userService.getUserByTokenForTsx();
-        return postRepository.findByVotesUserIdAndVotesVoteType(user != null ? user.getId(): "not found", EVoteType.UPVOTE).orElse(null) != null;
+        return postRepository.findByIdAndVotesUserIdAndVotesVoteType(postId, user != null ? user.getId(): "not found", EVoteType.UPVOTE).orElse(null) != null;
     }
 
-    private boolean isDownVoted(){
+    private boolean isDownVoted(String postId){
         User user = userService.getUserByTokenForTsx();
-        return postRepository.findByVotesUserIdAndVotesVoteType(user != null ? user.getId(): "not found", EVoteType.DOWNVOTE).orElse(null) != null;
+        return postRepository.findByIdAndVotesUserIdAndVotesVoteType(postId, user != null ? user.getId(): "not found", EVoteType.DOWNVOTE).orElse(null) != null;
     }
 
     private PostResponse toResponse(Post post) {
         return PostResponse.builder()
                 .id(post.getId())
                 .user(post.getUser().getUsername())
+                .userId(post.getUser().getId())
                 .profilePictureUrl(post.getUser().getProfilePicture() == null ? null : post.getUser().getProfilePicture().getImage())
                 .title(post.getTitle())
                 .body(post.getBody())
@@ -179,8 +178,8 @@ public class PostServiceImpl implements PostService {
                 .tagName(post.getTag() != null ? post.getTag().getName() : "No Tag")
                 .tagImgUrl(post.getTag() != null ? post.getTag().getImgUrl() : "No Image Tag")
                 .commentsCount(post.getComments() != null ? (long) post.getComments().size(): 0)
-                .isUpVoted(isUpVoted())
-                .isDownVoted(isDownVoted())
+                .isUpVoted(isUpVoted(post.getId()))
+                .isDownVoted(isDownVoted(post.getId()))
                 .upVotesCount(post.getVotes() != null ? post.getVotes().stream().filter(votePost -> votePost.getVoteType() == EVoteType.UPVOTE).count() : 0)
                 .downVotesCount(post.getVotes() != null ? post.getVotes().stream().filter(votePost -> votePost.getVoteType() == EVoteType.DOWNVOTE).count() : 0)
                 .createAt(post.getCreatedAt())

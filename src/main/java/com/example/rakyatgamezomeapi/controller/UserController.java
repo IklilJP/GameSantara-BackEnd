@@ -1,7 +1,6 @@
 package com.example.rakyatgamezomeapi.controller;
 
 import com.example.rakyatgamezomeapi.constant.APIUrl;
-import com.example.rakyatgamezomeapi.constant.ResponseMessage;
 import com.example.rakyatgamezomeapi.model.dto.request.UserBioRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.UserFullNameRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.UserUsernameRequest;

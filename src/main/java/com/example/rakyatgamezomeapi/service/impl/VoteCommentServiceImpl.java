@@ -21,9 +21,9 @@ public class VoteCommentServiceImpl implements VoteCommentService {
     private final VoteCommentRepository voteCommentRepository;
     @Override
     public VoteCommentResponse vote(String commentTargetId, EVoteType voteType) {
-        VoteComment voteComment = voteCommentRepository.findByCommentId(commentTargetId).orElse(null);
         Comment comment = commentService.getCommentByIdForTrx(commentTargetId);
         User user = userService.getUserByTokenForTsx();
+        VoteComment voteComment = voteCommentRepository.findByCommentIdAndUserId(commentTargetId, user.getId()).orElse(null);
         if (voteComment == null) {
             voteComment = VoteComment.builder()
                     .comment(comment)

@@ -41,15 +41,6 @@ public class GlobalExceptionController {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(commonResponse);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<CommonResponse<String>> handleRuntimeException(RuntimeException ex) {
-        CommonResponse<String> commonResponse = CommonResponse.<String>builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message(ex.getMessage())
-                .build();
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(commonResponse);
-    }
-
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<CommonResponse<String>> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
         CommonResponse<String> commonResponse = CommonResponse.<String>builder()
