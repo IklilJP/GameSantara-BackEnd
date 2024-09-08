@@ -29,7 +29,7 @@ public class VotePostServiceImpl implements VotePostService {
     public VotePostResponse vote(String postTargetId, EVoteType voteType) {
         Post post = postService.getPostByIdForTrx(postTargetId);
         User user = userService.getUserByTokenForTsx();
-        VotePost votePost = votePostRepository.findByPostIdAndUserId(postTargetId, user.getId()  ).orElse(null);
+        VotePost votePost = votePostRepository.findByPostIdAndUserId(postTargetId, user.getId()).orElse(null);
         if (votePost == null) {
             votePost = VotePost.builder()
                     .post(post)

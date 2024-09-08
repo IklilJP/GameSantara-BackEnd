@@ -43,6 +43,7 @@ public class AuthServiceImpl implements AuthService {
                 .role(role)
                 .email(request.getEmail())
                 .fullName(request.getFullName())
+                .coin(0L)
                 .createdAt(System.currentTimeMillis())
                 .build();
         try {

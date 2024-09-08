@@ -35,7 +35,14 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostResponse> getAllPosts(SearchPostRequest request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Page<Post> allPosts = postRepository.findAllByTitleContainingOrBodyContaining(request.getQuery(), pageable);
+        Page<Post> allPosts;
+
+        if(request.getQuery().isEmpty()){
+            allPosts = postRepository.findAll(pageable);
+        }else{
+            allPosts = postRepository.findAllByTitleContainingOrBodyContaining(request.getQuery(), pageable);
+        }
+
         if(allPosts.isEmpty()) {
             throw new ResourceNotFoundException("All posts is empty");
         }
@@ -46,7 +53,13 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostResponse> getAllLatestPosts(SearchPostRequest request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), Sort.by("createdAt").descending());
-        Page<Post> allPosts = postRepository.findAllByTitleContainingOrBodyContaining(request.getQuery(), pageable);
+        Page<Post> allPosts;
+        if(request.getQuery().isEmpty()){
+            allPosts = postRepository.findAll(pageable);
+        }else{
+            allPosts = postRepository.findAllByTitleContainingOrBodyContaining(request.getQuery(), pageable);
+        }
+
         if(allPosts.isEmpty()) {
             throw new ResourceNotFoundException("All posts is empty");
         }
@@ -57,7 +70,13 @@ public class PostServiceImpl implements PostService {
     @Override
     public Page<PostResponse> getAllTrendingPosts(SearchPostRequest request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Page<Post> allPosts = postRepository.findAllAndSortByTrending(request.getQuery(), pageable);
+        Page<Post> allPosts;
+
+        if(request.getQuery().isEmpty()){
+            allPosts = postRepository.findAllOrderByVotesAndComments(pageable);
+        }else{
+            allPosts = postRepository.findAllAndSortByTrending(request.getQuery(), pageable);
+        }
 
         if (allPosts.isEmpty()) {
             throw new ResourceNotFoundException("All posts is empty");
@@ -77,6 +96,84 @@ public class PostServiceImpl implements PostService {
         }
         return allPosts.map(this::toResponse);
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<PostResponse> getAllUserPosts(SearchPostRequest request, String userId) {
+        User user = userService.getUserByIdForTsx(userId);
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Post> allPosts = postRepository.findAllByUserId(user.getId(), pageable);
+        if(allPosts.isEmpty()) {
+            throw new ResourceNotFoundException("All posts is empty");
+        }
+        return allPosts.map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<PostResponse> getAllPostsWhichUserIdUpVotes(SearchPostRequest request, String userId) {
+        User user = userService.getUserByIdForTsx(userId);
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Post> allPosts = postRepository.findAllByVotesUserIdAndVotesVoteType(user.getId(), EVoteType.UPVOTE, pageable);
+        if(allPosts.isEmpty()) {
+            throw new ResourceNotFoundException("All posts is empty");
+        }
+        return allPosts.map(this::toResponse);
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Page<PostResponse> getAllPostsByTagId(SearchPostRequest request, String tagId) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Post> allPosts;
+
+        if(request.getQuery().isEmpty()){
+            allPosts = postRepository.findAllByTagId(tagId, pageable);
+        }else{
+            allPosts = postRepository.findAllByTagIdAndQueryContaining(tagId, request.getQuery(), pageable);
+        }
+
+        if(allPosts.isEmpty()) {
+            throw new ResourceNotFoundException("All posts is empty");
+        }
+
+        return allPosts.map(this::toResponse);
+    }
+
+    @Override
+    public Page<PostResponse> getAllLatestPostsByTagId(SearchPostRequest request, String tagId) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), Sort.by("createdAt").descending());
+        Page<Post> allPosts;
+        if(request.getQuery().isEmpty()){
+            allPosts = postRepository.findAllByTagId(tagId, pageable);
+        }else{
+            allPosts = postRepository.findAllByTagIdAndQueryContaining(tagId, request.getQuery(), pageable);
+        }
+
+        if(allPosts.isEmpty()) {
+            throw new ResourceNotFoundException("All posts is empty");
+        }
+        return allPosts.map(this::toResponse);
+    }
+
+    @Override
+    public Page<PostResponse> getAllTrendingPostsByTagId(SearchPostRequest request, String tagId) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        Page<Post> allPost;
+
+        if(request.getQuery().isEmpty()){
+            allPost = postRepository.findAllByTagIdOrderByVotesAndComments(tagId, pageable);
+        }else {
+            allPost = postRepository.findAllByTagIdAndQueryContaining(tagId, request.getQuery(), pageable);
+        }
+
+        if(allPost.isEmpty()) {
+            throw new ResourceNotFoundException("All posts is empty");
+        }
+
+        return allPost.map(this::toResponse);
+    }
+
 
     @Override
     public PostResponse getPostById(String id) {

@@ -32,7 +32,9 @@ public class PostController {
             @RequestParam(name = "page", defaultValue = "1") Integer page,
             @RequestParam(name = "size", defaultValue = "10") Integer size,
             @RequestParam(name = "q", defaultValue = "") String query,
-            @RequestParam(name = "by", defaultValue = "") String by
+            @RequestParam(name = "by", defaultValue = "") String by,
+            @RequestParam(name = "userId", defaultValue = "") String userId,
+            @RequestParam(name = "tagId", defaultValue = "") String tagId
     ) {
         SearchPostRequest request = SearchPostRequest.builder()
                 .page(Math.max(page - 1, 0))
@@ -44,6 +46,11 @@ public class PostController {
             case "latest" -> postService.getAllLatestPosts(request);
             case "trend" -> postService.getAllTrendingPosts(request);
             case "user" -> postService.getAllUserContextPosts(request);
+            case "user-target" -> postService.getAllUserPosts(request, userId);
+            case "user-upvote" -> postService.getAllPostsWhichUserIdUpVotes(request, userId);
+            case "tag" -> postService.getAllPostsByTagId(request, tagId);
+            case "tag-latest" -> postService.getAllLatestPostsByTagId(request, tagId);
+            case "tag-trend" -> postService.getAllTrendingPostsByTagId(request, tagId);
             default -> postService.getAllPosts(request);
         };
 

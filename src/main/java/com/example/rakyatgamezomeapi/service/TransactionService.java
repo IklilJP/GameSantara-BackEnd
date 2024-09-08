@@ -9,4 +9,5 @@ public interface TransactionService {
     Page<TransactionResponse> getTransactionsByUserId(CommonPaginationRequest request);
     TransactionResponse getTransactionById(String transactionId);
     TransactionResponse createPurchaseTransaction( TransactionRequest transactionRequest );
+    TransactionResponse paymentPurchaseTransaction(String transactionId);
 }

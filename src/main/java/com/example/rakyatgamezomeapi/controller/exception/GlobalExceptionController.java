@@ -9,6 +9,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -84,6 +85,15 @@ public class GlobalExceptionController {
                 .message(ex.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(commonResponse);
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<CommonResponse<String>> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex) {
+        CommonResponse<String> commonResponse = CommonResponse.<String>builder()
+                .status(HttpStatus.PAYLOAD_TOO_LARGE.value())
+                .message(ex.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(commonResponse);
     }
 
     @ExceptionHandler(AuthenticationException.class)

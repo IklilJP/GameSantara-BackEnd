@@ -14,5 +14,8 @@ public class TransactionResponse {
     private String userId;
     private String productId;
     private Long totalPrice;
+    private String token;
+    private String redirectUrl;
     private Long createdAt;
+    private Long updatedAt;
 }

@@ -32,5 +32,10 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private ETransactionType type;
 
+    @OneToOne
+    @JoinColumn(name = "payment_id", unique = true)
+    private Payment payment;
+
     private Long createdAt;
+    private Long updatedAt;
 }

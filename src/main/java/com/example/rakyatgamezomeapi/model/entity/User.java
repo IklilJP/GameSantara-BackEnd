@@ -52,11 +52,15 @@ public class User {
     @JsonIgnore
     private List<Follow> followeds;
 
+    @OneToMany(mappedBy = "user")
+    @JsonIgnore
+    private List<Post> posts;
+
     private Boolean isActive = true;
 
     private String bio;
 
-    private Long coin;
+    private Long coin = 0L;
 
     @Column(name = "created_at")
     private Long createdAt;

@@ -47,6 +47,7 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
                     "use_filename", true,
                     "unique_filename", true,
                     "overwrite", true,
+                    "quality", "auto:low",
                     "folder", "profile-pictures"
             );
             Map result = cloudinary.uploader().upload(file.getBytes(), param1);

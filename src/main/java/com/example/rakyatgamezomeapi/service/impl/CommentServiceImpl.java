@@ -110,12 +110,12 @@ public class CommentServiceImpl implements CommentService {
 
     private Boolean isUpvoted(String id) {
         User user = userService.getUserByTokenForTsx();
-        return commentRepository.findByIdAndUserIdAndVotesVoteType(id, user != null?user.getId() : "notfound", EVoteType.UPVOTE).orElse(null) != null;
+        return commentRepository.findByIdAndVotesUserIdAndVotesVoteType(id, user != null?user.getId() : "notfound", EVoteType.UPVOTE).orElse(null) != null;
     }
 
     private Boolean isDownvoted(String id) {
         User user = userService.getUserByTokenForTsx();
-        return commentRepository.findByIdAndUserIdAndVotesVoteType(id, user != null?user.getId() : "notfound", EVoteType.DOWNVOTE).orElse(null) != null;
+        return commentRepository.findByIdAndVotesUserIdAndVotesVoteType(id, user != null?user.getId() : "notfound", EVoteType.DOWNVOTE).orElse(null) != null;
     }
 
     private CommentResponse toResponse(Comment comment) {

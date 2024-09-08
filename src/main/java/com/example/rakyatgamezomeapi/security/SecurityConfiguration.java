@@ -47,6 +47,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/swagger-ui/**", "/docs/api/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/tags/**").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/user/{id}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/post/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/comment/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/tags/**").permitAll()

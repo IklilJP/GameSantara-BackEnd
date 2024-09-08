@@ -27,7 +27,7 @@ public class JwtServiceImpl implements JwtService {
     public JwtServiceImpl(@Value("${app.rakyatgamezone.jwt.jwt-secret}") String jwtSecret, @Value("${app.rakyatgamezone.jwt.app-name}") String appName, @Value("${app.rakyatgamezone.jwt.expired}") long jwtExpiration) {
         this.JWT_SECRET = jwtSecret;
         this.ISSUER = appName;
-        this.JWT_EXPIRATION = jwtExpiration;
+        this.JWT_EXPIRATION = jwtExpiration*24*30;
     }
 
     @Override

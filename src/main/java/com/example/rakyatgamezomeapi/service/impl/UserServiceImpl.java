@@ -1,10 +1,12 @@
 package com.example.rakyatgamezomeapi.service.impl;
 
+import com.example.rakyatgamezomeapi.constant.EVoteType;
 import com.example.rakyatgamezomeapi.model.authorize.UserAccount;
 import com.example.rakyatgamezomeapi.model.dto.request.UserBioRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.UserFullNameRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.UserUsernameRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.UserResponse;
+import com.example.rakyatgamezomeapi.model.entity.Post;
 import com.example.rakyatgamezomeapi.model.entity.ProfilePicture;
 import com.example.rakyatgamezomeapi.model.entity.User;
 import com.example.rakyatgamezomeapi.repository.UserRepository;
@@ -25,50 +27,57 @@ public class UserServiceImpl implements UserService {
     private final UserAccountService userAccountService;
     private final ProfilePictureService profilePictureService;
 
+    @Transactional(readOnly = true)
     @Override
     public UserResponse getUserByToken() {
         UserAccount userAccount = userAccountService.getByContext();
-        return toResponse(findByIdOrNull(userAccount.getId()));
+        return toResponse(findByIdOrThrow(userAccount.getId()));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public UserResponse getUserById(String id) {
-        return toResponse(findByIdOrNull(id));
+        return toResponse(findByIdOrThrow(id));
     }
 
+    @Transactional(readOnly = true)
     @Override
     public User getUserByTokenForTsx() {
         UserAccount userAccount = userAccountService.getByContext();
         return findByIdOrNull(userAccount.getId() == null ? "notfound" : userAccount.getId());
     }
 
+    @Transactional(readOnly = true)
     @Override
     public User getUserByIdForTsx(String id) {
-        return findByIdOrNull(id);
+        return findByIdOrThrow(id);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public UserResponse updateUserBioByToken(UserBioRequest userRequest) {
         UserAccount userAccount = userAccountService.getByContext();
-        User user = findByIdOrNull(userAccount.getId());
+        User user = findByIdOrThrow(userAccount.getId());
         user.setBio(userRequest.getBio());
         user.setUpdatedAt(System.currentTimeMillis());
         return toResponse(userRepository.saveAndFlush(user));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public UserResponse updateUserFullNameByToken(UserFullNameRequest userRequest) {
         UserAccount userAccount = userAccountService.getByContext();
-        User user = findByIdOrNull(userAccount.getId());
+        User user = findByIdOrThrow(userAccount.getId());
         user.setFullName(userRequest.getFullName());
         user.setUpdatedAt(System.currentTimeMillis());
         return toResponse(userRepository.saveAndFlush(user));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public UserResponse updateUserUsernameByToken(UserUsernameRequest userRequest) {
         UserAccount userAccount = userAccountService.getByContext();
-        User user = findByIdOrNull(userAccount.getId());
+        User user = findByIdOrThrow(userAccount.getId());
         user.setUsername(userRequest.getUsername());
         user.setUpdatedAt(System.currentTimeMillis());
         return toResponse(userRepository.saveAndFlush(user));
@@ -78,7 +87,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateUserProfilePicture(MultipartFile profilePicture) {
         UserAccount userAccount = userAccountService.getByContext();
-        User user = findByIdOrNull(userAccount.getId());
+        User user = findByIdOrThrow(userAccount.getId());
         FileUploadUtil.assertAllowedExtension(profilePicture, FileUploadUtil.IMAGE_PATTERN);
         ProfilePicture picture = profilePictureService.upload(profilePicture, user.getId());
         user.setProfilePicture(picture);
@@ -86,17 +95,19 @@ public class UserServiceImpl implements UserService {
         return toResponse(userRepository.saveAndFlush(user));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public UserResponse banUser(String id) {
-        User user = findByIdOrNull(id);
+        User user = findByIdOrThrow(id);
         user.setIsActive(false);
         user.setUpdatedAt(System.currentTimeMillis());
         return toResponse(userRepository.saveAndFlush(user));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public UserResponse unbanUser(String id) {
-        User user = findByIdOrNull(id);
+        User user = findByIdOrThrow(id);
         user.setIsActive(true);
         user.setUpdatedAt(System.currentTimeMillis());
         return toResponse(userRepository.saveAndFlush(user));
@@ -118,8 +129,14 @@ public class UserServiceImpl implements UserService {
                 .profilePicture(user.getProfilePicture())
                 .email(user.getEmail())
                 .bio(user.getBio())
+                .coin(user.getCoin() == null ? 0 : user.getCoin())
                 .followingsCount((long) user.getFollowings().size())
                 .followersCount((long) user.getFolloweds().size())
+                .upVotesCount(user.getPosts().stream()
+                        .flatMap(post -> post.getVotes().stream())
+                        .filter(votePost -> votePost.getVoteType().equals(EVoteType.UPVOTE))
+                        .count())
+                .postsCount((long) user.getPosts().size())
                 .createdAt(user.getCreatedAt())
                 .updatedAt(user.getUpdatedAt())
                 .build();

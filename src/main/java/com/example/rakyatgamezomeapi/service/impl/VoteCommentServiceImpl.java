@@ -31,15 +31,16 @@ public class VoteCommentServiceImpl implements VoteCommentService {
                     .user(user)
                     .createdAt(System.currentTimeMillis())
                     .build();
+            return toResponse(voteCommentRepository.saveAndFlush(voteComment));
         }else if(voteComment.getVoteType() == voteType && voteComment.getComment().getId().equals(comment.getId())) {
             voteCommentRepository.delete(voteComment);
             return null;
         }else{
             voteComment.setVoteType(voteType);
             voteComment.setUpdatedAt(System.currentTimeMillis());
+            return toResponse(voteCommentRepository.saveAndFlush(voteComment));
         }
 
-        return toResponse(voteCommentRepository.saveAndFlush(voteComment));
     }
 
     private VoteCommentResponse toResponse(VoteComment voteComment) {

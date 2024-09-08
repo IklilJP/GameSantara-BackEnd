@@ -35,6 +35,7 @@ public class PostPictureServiceImpl implements PostPictureService {
                     "use_filename", true,
                     "unique_filename", true,
                     "overwrite", false,
+                    "quality", "auto:low",
                     "folder", "posts/"+postId+"/"
             );
             Map result = cloudinary.uploader().upload(file.getBytes(), param);
