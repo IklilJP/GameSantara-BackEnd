@@ -15,7 +15,9 @@ import com.example.rakyatgamezomeapi.service.UserAccountService;
 import com.example.rakyatgamezomeapi.service.UserService;
 import com.example.rakyatgamezomeapi.utils.FileUploadUtil;
 import com.example.rakyatgamezomeapi.utils.exceptions.ResourceNotFoundException;
+import com.example.rakyatgamezomeapi.utils.exceptions.UsernameAlreadyExistException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,7 +82,11 @@ public class UserServiceImpl implements UserService {
         User user = findByIdOrThrow(userAccount.getId());
         user.setUsername(userRequest.getUsername());
         user.setUpdatedAt(System.currentTimeMillis());
-        return toResponse(userRepository.saveAndFlush(user));
+        try {
+            return toResponse(userRepository.saveAndFlush(user));
+        }catch (DataIntegrityViolationException e) {
+            throw new UsernameAlreadyExistException("Username already exists");
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
