@@ -2,6 +2,7 @@ package com.example.rakyatgamezomeapi.configuration;
 
 import com.cloudinary.Cloudinary;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,6 +18,15 @@ import java.util.Map;
 
 @Configuration
 public class BeanConfiguration {
+    @Value("${cloudinary.cloud.name}")
+    private String cloudName;
+
+    @Value("${cloudinary.api.key}")
+    private String apiKey;
+
+    @Value("${cloudinary.api.secret}")
+    private String apiSecret;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -43,9 +53,9 @@ public class BeanConfiguration {
     @Bean
     public Cloudinary cloudinary() {
         final Map<String, String> config = new HashMap<>();
-        config.put("cloud_name", System.getenv("CLOUDINARY_CLOUD_NAME"));
-        config.put("api_key", System.getenv("CLOUDINARY_API_KEY"));
-        config.put("api_secret", System.getenv("CLOUDINARY_API_SECRET"));
+        config.put("cloud_name", cloudName);
+        config.put("api_key", apiKey);
+        config.put("api_secret", apiSecret);
         return new Cloudinary(config);
     }
 }
