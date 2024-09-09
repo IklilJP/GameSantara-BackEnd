@@ -6,5 +6,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ProfilePictureService {
     ProfilePicture upload(MultipartFile file, String userId );
+    ProfilePicture createDefaultProfilePicture(String userId );
 //    byte[] download(String fileName);
 }

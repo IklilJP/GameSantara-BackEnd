@@ -140,6 +140,7 @@ public class PostServiceImpl implements PostService {
         return allPosts.map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<PostResponse> getAllLatestPostsByTagId(SearchPostRequest request, String tagId) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize(), Sort.by("createdAt").descending());
@@ -156,6 +157,7 @@ public class PostServiceImpl implements PostService {
         return allPosts.map(this::toResponse);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Page<PostResponse> getAllTrendingPostsByTagId(SearchPostRequest request, String tagId) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());

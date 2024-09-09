@@ -2,7 +2,6 @@ package com.example.rakyatgamezomeapi.controller.exception;
 
 import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.utils.exceptions.*;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -31,15 +30,6 @@ public class GlobalExceptionController {
                 .data(errors)
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(commonResponse);
-    }
-
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<CommonResponse<String>> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        CommonResponse<String> commonResponse = CommonResponse.<String>builder()
-                .status(HttpStatus.CONFLICT.value())
-                .message("Terjadi masalah pada pengisian database")
-                .build();
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(commonResponse);
     }
 
     @ExceptionHandler(EmailAlreadyExistsException.class)

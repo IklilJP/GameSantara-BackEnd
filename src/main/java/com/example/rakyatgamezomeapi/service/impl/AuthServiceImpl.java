@@ -5,12 +5,14 @@ import com.example.rakyatgamezomeapi.model.dto.request.AuthRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.RegisterUserRequest;
 import com.example.rakyatgamezomeapi.model.dto.response.LoginResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.RegisterResponse;
+import com.example.rakyatgamezomeapi.model.entity.ProfilePicture;
 import com.example.rakyatgamezomeapi.model.entity.Role;
 import com.example.rakyatgamezomeapi.model.authorize.UserAccount;
 import com.example.rakyatgamezomeapi.model.entity.User;
 import com.example.rakyatgamezomeapi.repository.UserRepository;
 import com.example.rakyatgamezomeapi.service.AuthService;
 import com.example.rakyatgamezomeapi.service.JwtService;
+import com.example.rakyatgamezomeapi.service.ProfilePictureService;
 import com.example.rakyatgamezomeapi.service.RoleService;
 import com.example.rakyatgamezomeapi.utils.exceptions.EmailAlreadyExistsException;
 import com.example.rakyatgamezomeapi.utils.exceptions.UsernameAlreadyExistException;
@@ -28,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final RoleService roleService;
+    private final ProfilePictureService profilePictureService;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -36,6 +39,14 @@ public class AuthServiceImpl implements AuthService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public RegisterResponse registerUser(RegisterUserRequest request) {
+        if(userRepository.existsByUsername(request.getUsername())) {
+            throw new UsernameAlreadyExistException("Username already exists");
+        }
+
+        if(userRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException("Email already exists");
+        }
+
         Role role = roleService.getOrSave(ERole.USER);
         User user = User.builder()
                 .username(request.getUsername().toLowerCase())
@@ -46,15 +57,10 @@ public class AuthServiceImpl implements AuthService {
                 .coin(0L)
                 .createdAt(System.currentTimeMillis())
                 .build();
-        try {
-            userRepository.saveAndFlush(user);
-        } catch (DataIntegrityViolationException e) {
-            if(e.getMessage().contains("email_unique")){
-                throw new EmailAlreadyExistsException("Email already exists");
-            }
-            throw new UsernameAlreadyExistException("Username already exist");
-        }
-
+        user = userRepository.save(user);
+        ProfilePicture dummyProfilePicture = profilePictureService.createDefaultProfilePicture(user.getId());
+        user.setProfilePicture(dummyProfilePicture);
+        userRepository.saveAndFlush(user);
         return RegisterResponse.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
@@ -64,6 +70,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public RegisterResponse registerAdmin(RegisterUserRequest request) {
+        if(userRepository.existsByUsername(request.getUsername())) {
+            throw new UsernameAlreadyExistException("Username already exists");
+        }
+
+        if(userRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException("Email already exists");
+        }
         Role role = roleService.getOrSave(ERole.ADMIN);
         User user = User.builder()
                 .username(request.getUsername().toLowerCase())
@@ -73,15 +86,10 @@ public class AuthServiceImpl implements AuthService {
                 .fullName(request.getFullName())
                 .createdAt(System.currentTimeMillis())
                 .build();
-        try {
-            userRepository.saveAndFlush(user);
-        } catch (DataIntegrityViolationException e) {
-            if(e.getMessage().contains("email_unique")){
-                throw new EmailAlreadyExistsException("Email already exists");
-            }
-            throw new UsernameAlreadyExistException("Username already exist");
-        }
-
+        user = userRepository.save(user);
+        ProfilePicture dummyProfilePicture = profilePictureService.createDefaultProfilePicture(user.getId());
+        user.setProfilePicture(dummyProfilePicture);
+        userRepository.saveAndFlush(user);
         return RegisterResponse.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())

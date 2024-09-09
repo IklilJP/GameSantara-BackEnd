@@ -8,17 +8,8 @@ import com.example.rakyatgamezomeapi.repository.ProfilePictureRepository;
 import com.example.rakyatgamezomeapi.service.ProfilePictureService;
 import com.example.rakyatgamezomeapi.utils.exceptions.FileStorageException;
 import lombok.RequiredArgsConstructor;
-import net.coobird.thumbnailator.Thumbnails;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Map;
 
 @Service
@@ -66,6 +57,21 @@ public class ProfilePictureServiceImpl implements ProfilePictureService {
         }catch (Exception e){
             throw new FileStorageException("Failed to upload profile picture: " + e.getMessage());
         }
+    }
+
+    @Override
+    public ProfilePicture createDefaultProfilePicture(String userId) {
+        ProfilePicture foundProfilePicture = profilePictureRepository.findByUserId(userId).orElse(null);
+        if(foundProfilePicture != null) {
+            foundProfilePicture.setImage("https://res.cloudinary.com/dpofjmzdu/image/upload/v1724926159/assets/pp-notfound.jpg");
+            foundProfilePicture.setUpdatedAt(System.currentTimeMillis());
+        }else{
+            foundProfilePicture = ProfilePicture.builder()
+                    .image("https://res.cloudinary.com/dpofjmzdu/image/upload/v1724926159/assets/pp-notfound.jpg")
+                    .createdAt(System.currentTimeMillis())
+                    .build();
+        }
+        return profilePictureRepository.saveAndFlush(foundProfilePicture);
     }
 
 //    @Override
