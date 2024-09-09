@@ -15,7 +15,7 @@ COPY src ./src
 RUN mvn clean package -DskipTests
 
 # Gunakan image OpenJDK untuk runtime tahap kedua
-FROM openjdk:17-jdk-slim
+FROM openjdk:17-jdk-alpine
 
 # Set work directory di dalam container
 WORKDIR /app
