@@ -7,6 +7,7 @@ import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.PagingResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.TransactionResponse;
 import com.example.rakyatgamezomeapi.service.TransactionService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(APIUrl.TRANSACTION_API)
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class TransactionController {
     private final TransactionService transactionService;

@@ -5,5 +5,7 @@ import com.example.rakyatgamezomeapi.model.entity.Transaction;
 
 public interface PaymentService {
     Payment createPayment(Transaction transaction);
+    Payment updatePaymentStatusToExpired(String transactionId);
+    Payment checkPayment(String orderId);
     void checkFailedAndUpdatePayment();
 }

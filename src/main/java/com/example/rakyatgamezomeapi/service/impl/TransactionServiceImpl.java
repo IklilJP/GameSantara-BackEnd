@@ -1,5 +1,6 @@
 package com.example.rakyatgamezomeapi.service.impl;
 
+import com.example.rakyatgamezomeapi.constant.ETransactionStatus;
 import com.example.rakyatgamezomeapi.constant.ETransactionType;
 import com.example.rakyatgamezomeapi.model.dto.request.CommonPaginationRequest;
 import com.example.rakyatgamezomeapi.model.dto.request.PaymentRequest;
@@ -42,9 +43,19 @@ public class TransactionServiceImpl implements TransactionService {
         return allTrxByUserId.map(this::toResponse);
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public TransactionResponse getTransactionById(String id) {
-        return toResponse(findByIdOrThrow(id));
+        Transaction transaction = paymentPurchaseTransaction(id);
+        if(transaction.getPayment().getTransactionStatus().equals(ETransactionStatus.SETTLEMENT)){
+            User user = transaction.getUser();
+            user.setCoin(user.getCoin() + transaction.getProductCoin().getCoin());
+            Payment paymentTrx = paymentService.updatePaymentStatusToExpired(transaction.getId());
+            transaction.setUser(user);
+            transaction.setPayment(paymentTrx);
+            return toResponse(transactionRepository.saveAndFlush(transaction));
+        }
+        return toResponse(transaction);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -58,18 +69,17 @@ public class TransactionServiceImpl implements TransactionService {
                 .type(ETransactionType.PURCHASE)
                 .createdAt(System.currentTimeMillis())
                 .build();
+        transaction = transactionRepository.save(transaction);
         Payment payment = paymentService.createPayment(transaction);
         transaction.setPayment(payment);
         return toResponse(transactionRepository.saveAndFlush(transaction));
     }
 
-    @Override
-    public TransactionResponse paymentPurchaseTransaction(String transactionId) {
-        User user = userService.getUserByTokenForTsx();
+    private Transaction paymentPurchaseTransaction(String transactionId) {
         Transaction transaction = findByIdOrThrow(transactionId);
-        transaction.setPayment(paymentService.createPayment(transaction));
-        user.setCoin((user.getCoin()==null?0:user.getCoin()) + (transaction.getProductCoin().getCoin()));
-        return null;
+        Payment payment = paymentService.checkPayment(transaction.getPayment().getId());
+        transaction.setPayment(payment);
+        return transactionRepository.saveAndFlush(transaction);
     }
 
     private Transaction findByIdOrThrow(String id) {

@@ -6,6 +6,7 @@ import com.example.rakyatgamezomeapi.model.dto.response.CommonResponse;
 import com.example.rakyatgamezomeapi.model.dto.response.ProductCoinResponse;
 import com.example.rakyatgamezomeapi.service.ProductCoinService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +55,7 @@ public class ProductCoinController {
     }
 
     @PutMapping
-    public ResponseEntity<CommonResponse<ProductCoinResponse>> updateProductCoin(@RequestBody ProductCoinRequest productCoinRequest) {
+    public ResponseEntity<CommonResponse<ProductCoinResponse>> updateProductCoin(@Valid @RequestBody ProductCoinRequest productCoinRequest) {
         ProductCoinResponse productCoinResponse = productCoinService.updateProductCoin(productCoinRequest);
         CommonResponse<ProductCoinResponse> commonResponse = CommonResponse.<ProductCoinResponse>builder()
                 .status(HttpStatus.OK.value())

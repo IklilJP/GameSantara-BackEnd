@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class PaymentRequest {
-    @JsonProperty("transaction_detail")
+    @JsonProperty("transaction_details")
     private PaymentDetailRequest paymentDetail;
 }

@@ -37,7 +37,7 @@ public class ProductCoinServiceImpl implements ProductCoinService {
                 .name(productCoinRequest.getName())
                 .coin(productCoinRequest.getCoin())
                 .price(productCoinRequest.getPrice())
-                .createdAt(productCoinRequest.getCreatedAt())
+                .createdAt(System.currentTimeMillis())
                 .build();
         return toResponse(productCoinRepository.saveAndFlush(productCoin));
     }
@@ -48,7 +48,7 @@ public class ProductCoinServiceImpl implements ProductCoinService {
         productCoin.setName(productCoinRequest.getName());
         productCoin.setCoin(productCoinRequest.getCoin());
         productCoin.setPrice(productCoinRequest.getPrice());
-        productCoin.setUpdatedAt(productCoinRequest.getUpdatedAt());
+        productCoin.setUpdatedAt(System.currentTimeMillis());
         return toResponse(productCoinRepository.saveAndFlush(productCoin));
     }
 
