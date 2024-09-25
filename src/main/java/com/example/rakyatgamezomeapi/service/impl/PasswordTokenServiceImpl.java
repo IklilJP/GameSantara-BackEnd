@@ -47,6 +47,10 @@ public class PasswordTokenServiceImpl implements PasswordTokenService {
 
         User user = passwordToken.getUser();
         userService.updateUserPassword(user.getId(), newPassword);
+
+        //After reset password, set expire at now
+        passwordToken.setExpiresAt(LocalDateTime.now());
+        passwordTokenRepository.saveAndFlush(passwordToken);
     }
 
     private String generateToken(User user) {
