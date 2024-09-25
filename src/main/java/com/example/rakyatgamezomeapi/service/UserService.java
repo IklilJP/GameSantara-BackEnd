@@ -11,11 +11,13 @@ public interface UserService {
     UserResponse getUserByToken();
     UserResponse getUserById(String id);
     User getUserByTokenForTsx();
+    User getUserByEmailForTrx(String email);
     User getUserByIdForTsx(String id);
     UserResponse updateUserBioByToken(UserBioRequest userRequest);
     UserResponse updateUserFullNameByToken(UserFullNameRequest userRequest);
     UserResponse updateUserUsernameByToken(UserUsernameRequest userRequest);
     UserResponse updateUserProfilePicture(MultipartFile profilePicture);
+    void updateUserPassword(String id, String password);
     UserResponse banUser(String id);
     UserResponse unbanUser(String id);
 }

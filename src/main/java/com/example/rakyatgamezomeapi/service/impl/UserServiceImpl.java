@@ -18,6 +18,7 @@ import com.example.rakyatgamezomeapi.utils.exceptions.ResourceNotFoundException;
 import com.example.rakyatgamezomeapi.utils.exceptions.UsernameAlreadyExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserAccountService userAccountService;
     private final ProfilePictureService profilePictureService;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
     @Override
@@ -47,6 +49,11 @@ public class UserServiceImpl implements UserService {
     public User getUserByTokenForTsx() {
         UserAccount userAccount = userAccountService.getByContext();
         return findByIdOrNull(userAccount.getId() == null ? "notfound" : userAccount.getId());
+    }
+
+    @Override
+    public User getUserByEmailForTrx(String email) {
+        return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Transactional(readOnly = true)
@@ -99,6 +106,14 @@ public class UserServiceImpl implements UserService {
         user.setProfilePicture(picture);
         user.setUpdatedAt(System.currentTimeMillis());
         return toResponse(userRepository.saveAndFlush(user));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void updateUserPassword(String id, String password) {
+        User user = findByIdOrThrow(id);
+        user.setPassword(passwordEncoder.encode(password));
+        user.setUpdatedAt(System.currentTimeMillis());
     }
 
     @Transactional(rollbackFor = Exception.class)
