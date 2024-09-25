@@ -40,6 +40,9 @@ public class User {
     @JsonIgnore
     private ProfilePicture profilePicture;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private PasswordResetToken passwordResetToken;
+
     @OneToMany(mappedBy = "followingUser")
     @JsonIgnore
     private List<Follow> followings;

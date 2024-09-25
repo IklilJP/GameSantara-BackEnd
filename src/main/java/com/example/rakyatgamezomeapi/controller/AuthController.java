@@ -32,6 +32,15 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(commonResponse);
     }
 
+    @PostMapping("/forgot-password/{email}")
+    public ResponseEntity<CommonResponse<String>> forgotPassword(@PathVariable String email) {
+        CommonResponse<String> commonResponse = CommonResponse.<String>builder()
+                .status(HttpStatus.OK.value())
+                .message("Password reset email has been sent")
+                .build();
+        return ResponseEntity.status(HttpStatus.OK).body(commonResponse);
+    }
+
     @PostMapping("/register/admin")
     public ResponseEntity<CommonResponse<RegisterResponse>> registerAdmin(@Valid @RequestBody RegisterUserRequest request) {
         RegisterResponse registerResponse = authService.registerAdmin(request);
